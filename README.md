@@ -49,7 +49,7 @@ scripts/     benchmarking and strength-testing scripts
 | 4 | Search speed-ups (move ordering, transposition table, pruning) ✅ |
 | 5 | Search data recording ✅ |
 | 6 | Curated opening book + opening names ✅ |
-| 7 | Backend API |
+| 7 | Backend API (REST + WebSocket live thinking) ✅ |
 | 8 | Board, move history, evaluation panel |
 | 9 | AI Thinking panel + search tree viewer |
 | 10 | Learn page |
@@ -63,6 +63,17 @@ py -3.11 -m venv .venv
 .venv\Scripts\python -m pip install -e ".[dev]"
 .venv\Scripts\python -m pytest
 ```
+
+## Run the server
+
+```powershell
+.venv\Scripts\python -m chess_ai.server            # http://127.0.0.1:8000
+```
+
+API docs (interactive) at http://127.0.0.1:8000/docs. Main endpoints: `POST /api/games`,
+`POST /api/games/{id}/move`, `POST /api/games/{id}/ai-move`, `GET /api/games/{id}/tree`,
+and the WebSocket `/ws/games/{id}`, which streams the AI's search depth by depth.
+Difficulty levels: beginner, easy, medium, hard, master.
 
 ## Play against the AI (terminal)
 
