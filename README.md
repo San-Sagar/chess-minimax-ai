@@ -1,4 +1,4 @@
-# Chess Playing AI Using Min/Max Algorithm
+﻿# Chess Playing AI Using Min/Max Algorithm
 
 A chess engine written in Python that chooses its moves with the **minimax algorithm**
 and **alpha-beta pruning**, with a web interface where a human plays against it and
@@ -34,10 +34,10 @@ scripts/     benchmarking and strength-testing scripts
 
 | Phase | Work |
 |---|---|
-| 0 | Project setup ✅ |
-| 1 | Rules (python-chess) |
+| 0 | Project setup âœ… |
+| 1 | Rules (python-chess) ✅ |
 | 2 | Evaluation function |
-| 3 | Minimax → alpha-beta → iterative deepening → quiescence |
+| 3 | Minimax â†’ alpha-beta â†’ iterative deepening â†’ quiescence |
 | 4 | Search speed-ups (move ordering, transposition table, pruning) |
 | 5 | Search data recording |
 | 6 | Opening book + endgame tablebases |
