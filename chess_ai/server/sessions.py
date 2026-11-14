@@ -16,11 +16,11 @@ import time
 import uuid
 from collections import OrderedDict
 from collections.abc import Callable
-from dataclasses import asdict, dataclass
 
 from chess_ai import chess
 from chess_ai.engine.classic import MATE_SCORE
 from chess_ai.engine.engine import Engine
+from chess_ai.engine.levels import DEFAULT_LEVEL, LEVELS, Level, play_level_move
 from chess_ai.engine.search import IterationInfo, Searcher, format_score
 from chess_ai.engine.tree import record_tree
 from chess_ai.explain.narrative import explain_report
@@ -29,37 +29,6 @@ from chess_ai.game import BLACK, WHITE, Game, IllegalMoveError
 
 class SessionError(Exception):
     """A request that is valid but not allowed right now (e.g. not your turn)."""
-
-
-# ----------------------------------------------------------------------- levels
-
-
-@dataclass(frozen=True)
-class Level:
-    name: str
-    label: str
-    description: str
-    time_limit: float  # seconds per AI move (upper bound)
-    max_depth: int | None  # search depth cap (None = as deep as time allows)
-    randomness_cp: int  # may play any candidate within this many centipawns of the best
-    use_book: bool
-    analysis_time: float  # extra seconds for exact candidate scores (AI Thinking panel)
-
-    def to_dict(self) -> dict:
-        return asdict(self)
-
-
-LEVELS: dict[str, Level] = {lv.name: lv for lv in [
-    Level("beginner", "Beginner", "Looks 1 move ahead and often picks a weaker move.",
-          0.5, 1, 150, False, 0.4),
-    Level("easy", "Easy", "Looks 2 moves ahead, sometimes picks the second-best move.",
-          0.8, 2, 60, True, 0.5),
-    Level("medium", "Medium", "Searches 4 moves ahead with alpha-beta.",
-          1.5, 4, 0, True, 0.8),
-    Level("hard", "Hard", "Full engine, 3 seconds per move.", 3.0, None, 0, True, 1.0),
-    Level("master", "Master", "Full engine, 8 seconds per move.", 8.0, None, 0, True, 1.5),
-]}
-DEFAULT_LEVEL = "medium"
 
 
 # ----------------------------------------------------------------------- clock
@@ -251,22 +220,15 @@ class GameSession:
                 d["pv_san"] = _san_line(board, info.pv)
                 on_iteration(d)
 
-        reply = self.engine.choose_move(
-            board, time_limit=time_limit, max_depth=level.max_depth, analyze=True,
-            analysis_time=level.analysis_time, on_iteration=relay)
-        report = reply.to_dict()
-        played, intended = reply.move, None
-
         # Lower levels sometimes play a slightly worse candidate on purpose.
-        if level.randomness_cp and reply.analysis is not None:
-            best = reply.analysis.best.score
-            close = [c for c in reply.analysis.candidates
-                     if c.score >= best - level.randomness_cp]
-            pick = self.rng.choice(close)
-            if pick.move != reply.move:
-                intended, played = reply.san, pick.move
-                report["score"] = pick.score
-                report["score_text"] = format_score(pick.score)
+        choice = play_level_move(self.engine, board, level, self.rng, time_limit=time_limit,
+                                 analyze=True, on_iteration=relay)
+        reply, played, intended = choice.reply, choice.played, choice.intended_san
+        report = reply.to_dict()
+        if intended is not None:
+            pick = next(c for c in reply.analysis.candidates if c.move == played)
+            report["score"] = pick.score
+            report["score_text"] = format_score(pick.score)
         report["difficulty_choice"] = (
             {"intended_san": intended, "played_san": board.san(played),
              "reason": f"{level.label} level plays a weaker move on purpose sometimes"}

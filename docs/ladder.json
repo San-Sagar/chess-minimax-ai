@@ -1,0 +1,56 @@
+{
+ "settings": {
+  "levels": [
+   "beginner",
+   "easy",
+   "medium",
+   "hard"
+  ],
+  "openings": 6,
+  "hard_time": 1.0,
+  "workers": 7,
+  "out": "docs\\ladder"
+ },
+ "pairs": [
+  {
+   "stronger": "easy",
+   "weaker": "beginner",
+   "wins": 12,
+   "draws": 0,
+   "losses": 0,
+   "score": 1.0,
+   "elo": null,
+   "margin": null,
+   "cumulative_vs_beginner": null,
+   "note": "100% score: no finite Elo"
+  },
+  {
+   "stronger": "medium",
+   "weaker": "easy",
+   "wins": 11,
+   "draws": 0,
+   "losses": 1,
+   "score": 0.917,
+   "elo": 417,
+   "margin": 500,
+   "cumulative_vs_beginner": null
+  },
+  {
+   "stronger": "hard",
+   "weaker": "medium",
+   "wins": 6,
+   "draws": 4,
+   "losses": 2,
+   "score": 0.667,
+   "elo": 120,
+   "margin": 186,
+   "cumulative_vs_beginner": null
+  }
+ ],
+ "endings": {
+  "checkmate": 32,
+  "threefold_repetition": 1,
+  "move_limit": 1,
+  "insufficient_material": 2
+ }
+}

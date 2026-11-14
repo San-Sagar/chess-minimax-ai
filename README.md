@@ -53,7 +53,7 @@ scripts/     benchmarking and strength-testing scripts
 | 8 | Board, move history, evaluation panel (own HTML/CSS/JS, no libraries) ✅ |
 | 9 | AI Thinking panel + search tree viewer ✅ |
 | 10 | Learn page: animated minimax / alpha-beta lessons ✅ |
-| 11 | Strength testing |
+| 11 | Strength testing: tactics suite, level ladder, report (`docs/strength_report.md`) ✅ |
 | 12 | Project report |
 
 ## Setup

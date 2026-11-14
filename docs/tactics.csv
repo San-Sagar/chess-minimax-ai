@@ -1,0 +1,76 @@
+level,puzzle,theme,played,solved,found_depth,found_seconds,seconds,weaker_on_purpose
+beginner,Back-rank mate,mate,Ra8#,True,1,0.002,0.03,False
+beginner,Smothered mate,mate,Nf7#,True,1,0.001,0.02,False
+beginner,Queen mate with king support,mate,Qf8#,True,1,0.002,0.02,False
+beginner,Mate by promotion,mate,c8=Q#,True,1,0.0,0.01,False
+beginner,Long-range queen mate,mate,Qh8#,True,1,0.002,0.02,False
+beginner,Rook ladder,mate,Rb7,True,1,0.002,0.03,False
+beginner,"Quiet king move, then mate",mate,Ke5,False,,,0.02,False
+beginner,Free queen,hanging piece,Rxd5,True,1,0.001,0.05,False
+beginner,Knight fork,fork,Nc7+,True,1,0.001,0.03,False
+beginner,Pawn fork,fork,Kd2,False,,,0.02,False
+beginner,Skewer,skewer,Rb1+,True,1,0.002,0.04,False
+beginner,Discovered check,discovered attack,Nc4+,True,1,0.003,0.05,False
+beginner,Promote the pawn,promotion,b8=Q,True,1,0.0,0.01,False
+beginner,Poisoned pawn,avoid,Kf2,True,1,0.001,0.04,False
+beginner,Do not stalemate,avoid,Ke5,True,1,0.001,0.01,False
+easy,Back-rank mate,mate,Ra8#,True,1,0.001,0.03,False
+easy,Smothered mate,mate,Nf7#,True,1,0.001,0.02,False
+easy,Queen mate with king support,mate,Qf8#,True,1,0.002,0.02,False
+easy,Mate by promotion,mate,c8=Q#,True,1,0.0,0.01,False
+easy,Long-range queen mate,mate,Qh8#,True,1,0.001,0.02,False
+easy,Rook ladder,mate,Ra8+,False,,,0.02,False
+easy,"Quiet king move, then mate",mate,Rh1+,False,,,0.01,False
+easy,Free queen,hanging piece,Rxd5,True,1,0.0,0.03,False
+easy,Knight fork,fork,Nc7+,True,1,0.001,0.02,False
+easy,Pawn fork,fork,d4,True,2,0.007,0.01,False
+easy,Skewer,skewer,Rb1+,True,1,0.001,0.03,False
+easy,Discovered check,discovered attack,Nc4+,True,1,0.002,0.03,False
+easy,Promote the pawn,promotion,b8=Q,True,1,0.0,0.01,False
+easy,Poisoned pawn,avoid,Qa4+,True,1,0.001,0.02,False
+easy,Do not stalemate,avoid,Rh1+,True,1,0.001,0.01,False
+medium,Back-rank mate,mate,Ra8#,True,1,0.0,0.0,False
+medium,Smothered mate,mate,Nf7#,True,1,0.0,0.0,False
+medium,Queen mate with king support,mate,Qf8#,True,1,0.001,0.0,False
+medium,Mate by promotion,mate,c8=Q#,True,1,0.0,0.0,False
+medium,Long-range queen mate,mate,Qh8#,True,1,0.001,0.0,False
+medium,Rook ladder,mate,Ra7,True,3,0.041,0.1,False
+medium,"Quiet king move, then mate",mate,Kf7,True,3,0.009,0.02,False
+medium,Free queen,hanging piece,Rxd5,True,1,0.0,0.02,False
+medium,Knight fork,fork,Nc7+,True,1,0.001,0.01,False
+medium,Pawn fork,fork,d4,True,2,0.005,0.03,False
+medium,Skewer,skewer,Rb1+,True,1,0.001,0.02,False
+medium,Discovered check,discovered attack,Nc4+,True,1,0.002,0.02,False
+medium,Promote the pawn,promotion,b8=Q,True,1,0.0,0.03,False
+medium,Poisoned pawn,avoid,Qa4+,True,1,0.001,0.17,False
+medium,Do not stalemate,avoid,Kf7,True,1,0.001,0.01,False
+hard,Back-rank mate,mate,Ra8#,True,1,0.0,0.0,False
+hard,Smothered mate,mate,Nf7#,True,1,0.0,0.0,False
+hard,Queen mate with king support,mate,Qf8#,True,1,0.001,0.0,False
+hard,Mate by promotion,mate,c8=Q#,True,1,0.0,0.0,False
+hard,Long-range queen mate,mate,Qh8#,True,1,0.001,0.0,False
+hard,Rook ladder,mate,Ra7,True,3,0.031,0.08,False
+hard,"Quiet king move, then mate",mate,Kf7,True,3,0.007,0.01,False
+hard,Free queen,hanging piece,Rxd5,True,1,0.0,1.9,False
+hard,Knight fork,fork,Nc7+,True,1,0.001,1.51,False
+hard,Pawn fork,fork,d4,True,2,0.005,1.9,False
+hard,Skewer,skewer,Rb1+,True,1,0.001,2.43,False
+hard,Discovered check,discovered attack,Nc4+,True,1,0.002,1.59,False
+hard,Promote the pawn,promotion,b8=Q,True,1,0.0,2.46,False
+hard,Poisoned pawn,avoid,Qa4+,True,1,0.001,1.8,False
+hard,Do not stalemate,avoid,Kf7,True,1,0.001,0.02,False
+master,Back-rank mate,mate,Ra8#,True,1,0.001,0.0,False
+master,Smothered mate,mate,Nf7#,True,1,0.001,0.0,False
+master,Queen mate with king support,mate,Qf8#,True,1,0.001,0.01,False
+master,Mate by promotion,mate,c8=Q#,True,1,0.0,0.0,False
+master,Long-range queen mate,mate,Qh8#,True,1,0.001,0.0,False
+master,Rook ladder,mate,Ra7,True,3,0.028,0.07,False
+master,"Quiet king move, then mate",mate,Kf7,True,3,0.007,0.02,False
+master,Free queen,hanging piece,Rxd5,True,1,0.0,5.55,False
+master,Knight fork,fork,Nc7+,True,1,0.001,4.64,False
+master,Pawn fork,fork,d4,True,2,0.005,8.02,False
+master,Skewer,skewer,Rb1+,True,1,0.001,4.13,False
+master,Discovered check,discovered attack,Nc4+,True,1,0.002,4.4,False
+master,Promote the pawn,promotion,b8=Q,True,1,0.0,4.15,False
+master,Poisoned pawn,avoid,Qh5+,True,1,0.001,4.51,False
+master,Do not stalemate,avoid,Kf7,True,1,0.001,0.02,False
