@@ -52,7 +52,7 @@ scripts/     benchmarking and strength-testing scripts
 | 7 | Backend API (REST + WebSocket live thinking) ✅ |
 | 8 | Board, move history, evaluation panel (own HTML/CSS/JS, no libraries) ✅ |
 | 9 | AI Thinking panel + search tree viewer ✅ |
-| 10 | Learn page |
+| 10 | Learn page: animated minimax / alpha-beta lessons ✅ |
 | 11 | Strength testing |
 | 12 | Project report |
 

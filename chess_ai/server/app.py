@@ -258,5 +258,15 @@ async def game_socket(websocket: WebSocket, game_id: str) -> None:
 
 # ----------------------------------------------------------------------- web page
 
+class _FreshStaticFiles(StaticFiles):
+    """Serve the web page, but make browsers re-check files on every load, so an
+    updated page is never mixed with an old cached script."""
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 if (WEB_DIR / "index.html").is_file():
-    app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+    app.mount("/", _FreshStaticFiles(directory=WEB_DIR, html=True), name="web")

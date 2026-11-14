@@ -253,6 +253,13 @@ def test_websocket_streams_thinking():
         assert ws.receive_json()["type"] == "error"
 
 
+def test_web_pages_served_without_stale_cache():
+    for path in ("/", "/learn.html", "/js/learn.js", "/js/board.js"):
+        r = client.get(path)
+        assert r.status_code == 200, path
+        assert r.headers["cache-control"] == "no-cache"
+
+
 def test_websocket_unknown_game():
     with client.websocket_connect("/ws/games/nope") as ws:
         assert ws.receive_json()["type"] == "error"

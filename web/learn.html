@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learn: Minimax &amp; Alpha-Beta</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♞</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="learn-page">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">♞&#xFE0E;</span>
+      <div>
+        <h1>How the AI thinks</h1>
+        <p class="tagline">Minimax, alpha-beta pruning and the evaluation function, step by step</p>
+      </div>
+    </div>
+    <nav class="topnav">
+      <a class="btn primary" href="/">♟ Play</a>
+      <button id="btn-theme" class="btn icon" title="Light / dark theme" aria-label="Toggle theme">◐</button>
+    </nav>
+  </header>
+
+  <div class="learn-layout">
+    <nav class="toc" aria-label="Lessons">
+      <ol>
+        <li><a href="#tree">Game trees</a></li>
+        <li><a href="#minimax">Minimax</a></li>
+        <li><a href="#alphabeta">Alpha-beta pruning</a></li>
+        <li><a href="#ordering">Move ordering</a></li>
+        <li><a href="#evaluation">The evaluation function</a></li>
+        <li><a href="#horizon">Quiescence &amp; the horizon</a></li>
+        <li><a href="#engine">From textbook to engine</a></li>
+      </ol>
+    </nav>
+
+    <main class="lessons">
+      <!-- ============================================================ 1 -->
+      <section class="lesson" id="tree">
+        <h2 class="lesson-title"><span>1</span>Game trees</h2>
+        <p>In any chess position the side to move has a list of legal moves (20 at the start, around
+          35 in a typical middlegame). Each move leads to a new position, where the opponent has its own
+          list of moves, and so on. Drawn out, this is a <b>game tree</b>:</p>
+        <ul>
+          <li>the <b>root</b> is the current position;</li>
+          <li>each <b>branch</b> is a move; each <b>node</b> is the position it leads to;</li>
+          <li>one level down is one <b>ply</b> (a half-move: one side moves);</li>
+          <li>the <b>leaves</b> are where we stop looking and judge the position with the
+            <a href="#evaluation">evaluation function</a>.</li>
+        </ul>
+        <p>The tree grows very fast. With about 35 moves per position, looking <i>d</i> plies ahead means
+          about 35<sup><i>d</i></sup> leaves:</p>
+        <table class="growth">
+          <thead><tr><th>Depth (plies)</th><th>Leaf positions (≈ 35<sup>d</sup>)</th><th>At 15,000 positions/s</th></tr></thead>
+          <tbody id="growth-body"></tbody>
+        </table>
+        <p class="note">This is why a chess program cannot simply look at everything, and why the clever
+          parts of this project (alpha-beta and pruning) matter so much.</p>
+      </section>
+
+      <!-- ============================================================ 2 -->
+      <section class="lesson" id="minimax">
+        <h2 class="lesson-title"><span>2</span>Minimax</h2>
+        <p>Two players take turns. The AI is <b class="max">MAX</b>: it wants the score as <b>high</b>
+          as possible. The opponent is <b class="min">MIN</b>: it wants the score as <b>low</b> as possible.
+          Minimax assumes both play their best:</p>
+        <pre class="code">minimax(position, depth, maximizing):
+    if depth == 0 or game over:
+        return evaluate(position)
+    if maximizing:                                  # AI's turn
+        return max(minimax(child, depth-1, False) for each move)
+    else:                                           # opponent's turn
+        return min(minimax(child, depth-1, True)  for each move)</pre>
+        <p>Below is a small tree: <span class="shape-max">▲</span> MAX nodes,
+          <span class="shape-min">▼</span> MIN nodes, and ■ leaves with their evaluation scores. Press
+          <b>Step</b> to follow minimax, or <b>Play</b> to animate it. Values travel up from the leaves:
+          MIN nodes take the lowest child value, MAX nodes the highest.</p>
+        <div class="tree-player" id="player-minimax"></div>
+        <p class="note">Minimax visits <b>every</b> leaf. The answer is correct, but the cost grows as
+          b<sup>d</sup> (b = moves per position, d = depth).</p>
+      </section>
+
+      <!-- ============================================================ 3 -->
+      <section class="lesson" id="alphabeta">
+        <h2 class="lesson-title"><span>3</span>Alpha-beta pruning</h2>
+        <p>Alpha-beta gives <b>exactly the same answer</b> as minimax, but skips branches that cannot
+          change it. It carries two numbers down the tree:</p>
+        <ul>
+          <li><b>α (alpha)</b>: the best score the AI (MAX) is already guaranteed somewhere else;</li>
+          <li><b>β (beta)</b>: the best score the opponent (MIN) is already guaranteed somewhere else.</li>
+        </ul>
+        <p>If a position becomes so good for one side that the other side would simply avoid it
+          (<b>α ≥ β</b>), the remaining moves there do not matter. That is a <b>cutoff</b>: the rest of
+          that branch is <b>pruned</b>.</p>
+        <pre class="code">alphabeta(position, depth, α, β, maximizing):
+    if depth == 0 or game over: return evaluate(position)
+    if maximizing:
+        value = -∞
+        for each move:
+            value = max(value, alphabeta(child, depth-1, α, β, False))
+            α = max(α, value)
+            if α >= β: break        # β-cutoff: MIN will never allow this position
+        return value
+    else:
+        value = +∞
+        for each move:
+            value = min(value, alphabeta(child, depth-1, α, β, True))
+            β = min(β, value)
+            if α >= β: break        # α-cutoff: MAX will never play into this position
+        return value</pre>
+        <p>Same tree as above. Watch α and β change, and the dashed branches that are never visited.</p>
+        <div class="tree-player" id="player-alphabeta"></div>
+      </section>
+
+      <!-- ============================================================ 4 -->
+      <section class="lesson" id="ordering">
+        <h2 class="lesson-title"><span>4</span>Move ordering</h2>
+        <p>Alpha-beta cuts off the most when the <b>best move is tried first</b>: then every other move
+          only has to be shown "not better", which is quick. With the worst move first it saves almost
+          nothing. Knuth &amp; Moore (1975) showed that with perfect ordering alpha-beta needs only about
+          b<sup>⌈d/2⌉</sup> + b<sup>⌊d/2⌋</sup> − 1 leaves instead of b<sup>d</sup>: it can search
+          <b>twice as deep</b> in the same time.</p>
+        <p>Change the ordering of the tree in lesson 3 to see the difference:</p>
+        <div class="ordering-box">
+          <div class="segmented" id="ordering-choice">
+            <label><input type="radio" name="ordering" value="best"><span>Best move first</span></label>
+            <label><input type="radio" name="ordering" value="random" checked><span>As generated</span></label>
+            <label><input type="radio" name="ordering" value="worst"><span>Worst move first</span></label>
+          </div>
+          <table class="growth" id="ordering-table"></table>
+        </div>
+        <p>The engine orders moves with cheap guesses: the best move from the previous search (from the
+          <i>transposition table</i>), then captures (most valuable victim first), then <i>killer moves</i>
+          (quiet moves that caused cutoffs nearby), then a <i>history</i> score.</p>
+      </section>
+
+      <!-- ============================================================ 5 -->
+      <section class="lesson" id="evaluation">
+        <h2 class="lesson-title"><span>5</span>The evaluation function</h2>
+        <p>At the leaves the AI must judge a position <b>without searching further</b>. Our evaluation
+          adds up nine terms, each for White and for Black, in <b>centipawns</b> (100 = one pawn). Every
+          term has a middlegame and an endgame value, blended by how many pieces are left
+          (<b>tapered evaluation</b>). Pick a position; the numbers come live from the real engine:</p>
+        <div class="eval-lab">
+          <div>
+            <div class="mini-board" id="eval-board"></div>
+            <div class="segmented wrap" id="eval-positions"></div>
+          </div>
+          <div>
+            <p class="eval-total" id="eval-total">–</p>
+            <table class="eval-table" id="eval-table"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ 6 -->
+      <section class="lesson" id="horizon">
+        <h2 class="lesson-title"><span>6</span>Quiescence search &amp; the horizon effect</h2>
+        <p>Stopping the search at a fixed depth has a trap. In this position White can take a pawn with
+          the queen: <b>Qxd5</b>. If the search stops right after that move, the evaluation sees
+          "White has won a pawn". But the pawn on d5 is defended: <b>...exd5</b> wins the queen.
+          A search that stops too early does not see this, because it is <b>beyond its horizon</b>.</p>
+        <div class="horizon">
+          <div class="mini-board" id="horizon-board"></div>
+          <div>
+            <div class="segmented" id="horizon-steps">
+              <label><input type="radio" name="hz" value="0" checked><span>Position</span></label>
+              <label><input type="radio" name="hz" value="1"><span>After Qxd5</span></label>
+              <label><input type="radio" name="hz" value="2"><span>After …exd5</span></label>
+            </div>
+            <p class="eval-total" id="horizon-score">–</p>
+            <p id="horizon-text"></p>
+          </div>
+        </div>
+        <p><b>Quiescence search</b> fixes this: when the planned depth runs out, the AI keeps searching
+          <i>captures only</i> until the position is quiet. At each such node it may also "stand pat"
+          (keep the static score) if no capture improves it. In the project tests, the engine without
+          quiescence plays Qxd5 at depth 1 and the engine with it does not
+          (<code>test_quiescence_avoids_horizon_blunder</code>).</p>
+      </section>
+
+      <!-- ============================================================ 7 -->
+      <section class="lesson" id="engine">
+        <h2 class="lesson-title"><span>7</span>From textbook to engine</h2>
+        <p><b>Negamax.</b> The engine writes minimax in a shorter form. Every score is from the point of
+          view of the side to move, and is negated when passed up the tree, because
+          max(a, b) = −min(−a, −b). One function then plays both colours. The tests check it returns
+          exactly the textbook minimax score.</p>
+        <p><b>Iterative deepening.</b> The engine searches depth 1, then 2, then 3… until its time is up.
+          There is always a finished answer, and each depth's best move is tried first in the next,
+          which makes alpha-beta cut off more.</p>
+        <p><b>More pruning.</b> On top of alpha-beta the engine uses a transposition table (remembers
+          positions), principal variation search, null-move pruning, late-move reductions and futility
+          pruning. Measured on this project (positions searched to depth 4, four test positions, from
+          <code>scripts/ablation.py</code>):</p>
+        <table class="growth" id="ablation-table">
+          <thead><tr><th>Technique (added one at a time)</th><th>Positions</th><th>vs. alpha-beta only</th></tr></thead>
+          <tbody>
+            <tr><td>Alpha-beta + quiescence</td><td>707,165</td><td><span class="bar" style="--w:100%"></span>100%</td></tr>
+            <tr><td>+ move ordering</td><td>216,758</td><td><span class="bar" style="--w:30.7%"></span>30.7%</td></tr>
+            <tr><td>+ transposition table</td><td>146,959</td><td><span class="bar" style="--w:20.8%"></span>20.8%</td></tr>
+            <tr><td>+ principal variation search</td><td>77,258</td><td><span class="bar" style="--w:10.9%"></span>10.9%</td></tr>
+            <tr><td>+ null-move pruning</td><td>56,250</td><td><span class="bar" style="--w:8%"></span>8.0%</td></tr>
+            <tr><td>+ late-move reductions</td><td>21,365</td><td><span class="bar" style="--w:3%"></span>3.0%</td></tr>
+            <tr><td>Full engine (+ futility, aspiration, check extension)</td><td>16,782</td><td><span class="bar" style="--w:2.4%"></span>2.4%</td></tr>
+          </tbody>
+        </table>
+        <p>And plain minimax against alpha-beta at depth 3 (<code>scripts/compare_search.py</code>); both
+          return the same score every time:</p>
+        <table class="growth">
+          <thead><tr><th>Position</th><th>Minimax</th><th>Alpha-beta</th><th>Skipped</th></tr></thead>
+          <tbody>
+            <tr><td>Starting position</td><td>9,323</td><td>780</td><td>91.6%</td></tr>
+            <tr><td>Italian Game</td><td>31,506</td><td>3,293</td><td>89.5%</td></tr>
+            <tr><td>Middlegame</td><td>60,420</td><td>4,026</td><td>93.3%</td></tr>
+            <tr><td>Rook endgame</td><td>9,653</td><td>1,230</td><td>87.3%</td></tr>
+          </tbody>
+        </table>
+        <p class="note">Want to see it on a real move? Play a game, open the <b>AI Thinking</b> tab, and
+          press <b>Show the search tree</b>.</p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/learn.js"></script>
+</body>
+</html>
