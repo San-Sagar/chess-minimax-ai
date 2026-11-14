@@ -295,6 +295,22 @@ class Game:
         )
         return self._manual_end
 
+    def timeout(self, color: str | chess.Color) -> GameStatus:
+        """``color`` ran out of time. Normally a loss, but a draw if the opponent has
+        too little material to ever checkmate (official rule)."""
+        if self.is_over:
+            raise IllegalMoveError("the game is over")
+        loser = _parse_color(color)
+        if self._board.has_insufficient_material(not loser):
+            self._manual_end = GameStatus(True, "timeout_vs_insufficient_material", None,
+                                          "1/2-1/2")
+        else:
+            self._manual_end = GameStatus(
+                is_over=True, reason="timeout", winner=color_name(not loser),
+                result="0-1" if loser == chess.WHITE else "1-0",
+            )
+        return self._manual_end
+
     # ------------------------------------------------------------------ captures
 
     def captured_pieces(self) -> dict[str, list[str]]:

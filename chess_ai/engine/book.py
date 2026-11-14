@@ -13,6 +13,7 @@ It also names the opening being played ("Sicilian Defense: Najdorf").
 
 from __future__ import annotations
 
+import functools
 import random
 from collections import defaultdict
 from dataclasses import dataclass
@@ -71,20 +72,27 @@ class BookProbe:
                 "opening": self.opening.to_dict() if self.opening else None}
 
 
+@functools.lru_cache(maxsize=1)
+def _build_tables() -> tuple[dict, dict]:
+    """Build the book once (shared, read-only): {key: {move: weight}}, {key: Opening}."""
+    moves: dict = defaultdict(lambda: defaultdict(int))
+    names: dict = {}
+    for _eco, _name, line, weight in BOOK_LINES:
+        boards = _play(line)
+        for before, after in zip(boards, boards[1:]):
+            moves[_key(before)][after.peek()] += weight
+    for eco, name, line in OPENING_NAMES:
+        names[_key(_play(line)[-1])] = Opening(eco, name)
+    for eco, name, line, _ in BOOK_LINES:  # full lines carry their variation name
+        names.setdefault(_key(_play(line)[-1]), Opening(eco, name))
+    return {k: dict(v) for k, v in moves.items()}, names
+
+
 class OpeningBook:
     def __init__(self, seed: int | None = None, max_ply: int = MAX_BOOK_PLY) -> None:
         self.rng = random.Random(seed)
         self.max_ply = max_ply
-        self._moves: dict = defaultdict(lambda: defaultdict(int))  # key -> {move: weight}
-        self._names: dict = {}  # key -> Opening
-        for _eco, _name, line, weight in BOOK_LINES:
-            boards = _play(line)
-            for before, after in zip(boards, boards[1:]):
-                self._moves[_key(before)][after.peek()] += weight
-        for eco, name, line in OPENING_NAMES:
-            self._names[_key(_play(line)[-1])] = Opening(eco, name)
-        for eco, name, line, _ in BOOK_LINES:  # full lines carry their variation name
-            self._names.setdefault(_key(_play(line)[-1]), Opening(eco, name))
+        self._moves, self._names = _build_tables()
 
     @property
     def positions(self) -> int:
