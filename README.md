@@ -38,7 +38,7 @@ scripts/     benchmarking and strength-testing scripts
 | 0 | Project setup ✅ |
 | 1 | Rules (python-chess) ✅ |
 | 2 | Evaluation function ✅ |
-| 3 | Minimax → alpha-beta → iterative deepening → quiescence |
+| 3 | Minimax → alpha-beta → iterative deepening → quiescence ✅ |
 | 4 | Search speed-ups (move ordering, transposition table, pruning) |
 | 5 | Search data recording |
 | 6 | Opening book + endgame tablebases |
@@ -55,6 +55,19 @@ scripts/     benchmarking and strength-testing scripts
 py -3.11 -m venv .venv
 .venv\Scripts\python -m pip install -e ".[dev]"
 .venv\Scripts\python -m pytest
+```
+
+## Play against the AI (terminal)
+
+```powershell
+.venv\Scripts\python scripts\play.py                      # you are White, 3 s per AI move
+.venv\Scripts\python scripts\play.py --color black --time 5
+```
+
+## Compare minimax vs alpha-beta
+
+```powershell
+.venv\Scripts\python scripts\compare_search.py --depth 3 --csv docs\search_comparison.csv
 ```
 
 ## Inspect the evaluation
