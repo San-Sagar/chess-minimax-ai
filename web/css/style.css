@@ -284,6 +284,89 @@ h2:first-child { margin-top: 0; }
 .candidates .c-score { font-variant-numeric: tabular-nums; }
 .candidates .c-line { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* ------------------------------------------------------------------ AI Thinking panel */
+
+.th-head h3 { margin: 2px 0 4px; font-size: 18px; }
+.th-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.th-assess { margin: 0; }
+.th-note { background: #fbeee0; color: #7a4a12; border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+:root[data-theme="dark"] .th-note { background: #3a2d1d; color: #f0c98d; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .th-note { background: #3a2d1d; color: #f0c98d; } }
+.th-sec { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 10px; }
+.th-sec h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+             color: var(--muted); }
+.th-sec p { margin: 4px 0; font-size: 14px; }
+.th-ideas { margin: 0; padding-left: 18px; }
+.th-ideas li { margin: 3px 0; }
+.th-line { font-weight: 600; word-break: break-word; }
+.muted { color: var(--muted); font-size: 12.5px !important; }
+.th-alt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+          padding: 6px 10px; margin: 6px 0; }
+.th-alt.refuted { border-style: dashed; }
+.th-alt-top { display: flex; gap: 10px; align-items: baseline; }
+.th-score { font-variant-numeric: tabular-nums; }
+.th-diff { margin-left: auto; font-size: 12px; color: var(--danger); }
+.th-term { display: grid; grid-template-columns: 130px 1fr 52px; gap: 8px; align-items: center;
+           font-size: 13px; margin: 4px 0; }
+.th-bar { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden;
+          border: 1px solid var(--border); }
+.th-bar i { display: block; height: 100%; }
+.th-bar i.up, b.up { background: none; }
+.th-bar i.up { background: var(--accent); }
+.th-bar i.down { background: var(--danger); }
+.th-term b { text-align: right; font-variant-numeric: tabular-nums; }
+b.up { color: var(--accent); }
+b.down { color: var(--danger); }
+.th-depths { margin: 6px 0 10px; padding-left: 18px; font-size: 13px; color: var(--muted); }
+
+/* ------------------------------------------------------------------ search tree viewer */
+
+.dialog.wide { width: min(1180px, calc(100vw - 32px)); max-height: calc(100vh - 32px); }
+.tree-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+            flex-wrap: wrap; }
+.tree-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+.tree-controls select { width: auto; padding: 4px 8px; }
+.tree-legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin: 8px 0; }
+.lg { display: inline-block; width: 22px; height: 0; vertical-align: middle; margin-right: 6px;
+      border-top: 3px solid var(--accent); }
+.lg.cut { border-top-color: var(--danger); }
+.lg.pruned { border-top: 2px dashed var(--muted); }
+.tree-body { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 12px; }
+@media (max-width: 800px) { .tree-body { grid-template-columns: minmax(0, 1fr); } }
+.tree-scrollwrap { display: flex; border: 1px solid var(--border); border-radius: 10px;
+                   background: var(--surface-2); max-height: calc(100vh - 260px); overflow-y: auto;
+                   min-height: 200px; min-width: 0; }
+.tree-rows { flex: none; width: 92px; border-right: 1px solid var(--border); }
+.tree-host { overflow-x: auto; flex: 1; min-width: 0; }
+.tree-detail { font-size: 14px; }
+.tree-detail p { margin: 6px 0; }
+.tree-path { font-weight: 700; word-break: break-word; }
+.tree-ab { display: grid; gap: 4px; background: var(--surface-2); border: 1px solid var(--border);
+           border-radius: 8px; padding: 8px; font-size: 13px; }
+.cut-text { color: var(--danger); }
+.tree-svg { display: block; }
+.tree-svg .row-label { font: 700 12px system-ui, sans-serif; fill: var(--text); }
+.tree-svg .row-label.max { fill: var(--accent); }
+.tree-svg .row-label.min { fill: var(--danger); }
+.tree-svg .row-sub { font: 10px system-ui, sans-serif; fill: var(--muted); }
+.tree-svg .edge { fill: none; stroke: var(--muted); stroke-width: 1.2; opacity: .7; }
+.tree-svg .edge.best { stroke: var(--accent); stroke-width: 3.5; opacity: 1; }
+.tree-svg .edge.pruned { stroke-dasharray: 4 4; opacity: .45; }
+.tree-svg .cut-label { font: 600 10px system-ui, sans-serif; fill: var(--danger); }
+.tree-svg .node { cursor: pointer; }
+.tree-svg .node rect { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+.tree-svg .node.max rect { stroke: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+.tree-svg .node.min rect { stroke: color-mix(in srgb, var(--danger) 45%, var(--border)); }
+.tree-svg .node.best rect { stroke: var(--accent); stroke-width: 3; }
+.tree-svg .node.cutter rect { stroke: var(--danger); stroke-width: 2.5; }
+.tree-svg .node.pruned rect { fill: transparent; stroke-dasharray: 4 3; stroke: var(--muted); opacity: .6; }
+.tree-svg .node.pruned text { fill: var(--muted); opacity: .7; }
+.tree-svg .node.selected rect { fill: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+.tree-svg .node:focus { outline: none; }
+.tree-svg .node:focus-visible rect { stroke: var(--text); stroke-width: 3; }
+.tree-svg .n-san { font: 700 13px system-ui, sans-serif; fill: var(--text); text-anchor: middle; }
+.tree-svg .n-val { font: 12px ui-monospace, Consolas, monospace; fill: var(--muted); text-anchor: middle; }
+
 /* ------------------------------------------------------------------ dialogs */
 
 .dialog { border: 1px solid var(--border); border-radius: 14px; background: var(--surface);

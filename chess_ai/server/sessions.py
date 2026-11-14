@@ -23,6 +23,7 @@ from chess_ai.engine.classic import MATE_SCORE
 from chess_ai.engine.engine import Engine
 from chess_ai.engine.search import IterationInfo, Searcher, format_score
 from chess_ai.engine.tree import record_tree
+from chess_ai.explain.narrative import explain_report
 from chess_ai.game import BLACK, WHITE, Game, IllegalMoveError
 
 
@@ -276,6 +277,11 @@ class GameSession:
             self._charge_clock(self.ai)
             report.update(ply=rec.ply, san=rec.san, move=rec.uci, fen_before=board.fen(),
                           fen_after=rec.fen_after, level=level.name)
+            try:
+                report["explanation"] = explain_report(board, report)
+            except Exception as exc:  # an explanation bug must never stop the game
+                report["explanation"] = {"kind": "error", "headline": rec.san,
+                                         "assessment": f"(explanation unavailable: {exc})"}
             self.reports[rec.ply] = report
             score_white = _white_view(report["score"], self.ai)
             final = self._final_eval()

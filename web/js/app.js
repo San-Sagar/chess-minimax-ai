@@ -3,6 +3,8 @@
 import { ChessBoard } from "./board.js";
 import * as panels from "./panels.js";
 import * as sound from "./sound.js";
+import { renderThinking } from "./thinking.js";
+import { describeNode, drawTree } from "./tree.js";
 
 const $ = (id) => document.getElementById(id);
 const GLYPH = { p: "♟", n: "♞", b: "♝", r: "♜", q: "♛", k: "♚" };
@@ -26,6 +28,8 @@ const app = {
   clockFetchedAt: 0,
   wasOver: false,
   lastReport: null,
+  reports: new Map(), // ply -> full AI move report (cached)
+  thinkingPly: null, // AI ply currently shown in the AI Thinking panel
 };
 
 const board = new ChessBoard($("board"), { onMove: humanMove });
@@ -71,9 +75,10 @@ async function startGame(options) {
   app.shownFen = null;
   app.wasOver = false;
   app.lastReport = null;
+  app.reports = new Map();
+  app.thinkingPly = null;
   panels.resetSearch();
   $("candidates").innerHTML = `<li class="empty">Appears after the AI's first searched move.</li>`;
-  $("thinking-body").innerHTML = `<p class="empty">The AI's explanation of each move appears here.</p>`;
   setState(await api("/api/games", { method: "POST", body: options }));
   app.flipped = false;
   render();
@@ -164,11 +169,12 @@ function finishAiMove(report, state) {
   app.thinking = false;
   panels.setThinking(false);
   app.lastReport = report;
+  app.reports.set(report.ply, report);
+  app.thinkingPly = null; // force the panel to show this new report
   setState(state);
   const rec = state.game.history[state.game.history.length - 1];
   if (app.viewPly === null) sound.play(rec.is_check ? "check" : rec.captured ? "capture" : "move");
   panels.showReport(report);
-  showThinkingSummary(report);
   render();
 }
 
@@ -182,32 +188,70 @@ async function refresh() {
   }
 }
 
-// ---------------------------------------------------------------- AI Thinking (summary; Phase 9 adds the full story)
+// ---------------------------------------------------------------- AI Thinking panel
 
-function showThinkingSummary(report) {
+/** Show the explanation of the latest AI move at or before the position on the board. */
+async function updateThinking(shownPly) {
+  const s = app.state;
+  const plies = s.ai_plies.filter((p) => p <= shownPly);
+  const ply = plies.length ? plies[plies.length - 1] : null;
   const box = $("thinking-body");
-  const who = report.ply % 2 ? "White" : "Black";
-  if (report.source === "book") {
-    const opening = report.opening ? ` (${report.opening.name})` : "";
-    box.innerHTML = `<p><b>${report.san}</b>: an opening book move${opening}. ` +
-      `The AI knows this position from opening theory, so it plays instantly without searching.</p>`;
+  if (ply === null) {
+    app.thinkingPly = null;
+    renderThinking(box, null, {});
     return;
   }
-  const a = report.analysis;
-  const s = a.search;
-  const p = a.pruning;
-  let html = `<p><b>${report.san}</b> for ${who}, score <b>${report.score_text}</b> from the AI's side.</p>`;
-  html += `<p>Minimax with alpha-beta searched <b>${s.depth}</b> moves deep (longest line ${s.seldepth}) ` +
-    `and visited <b>${s.nodes.toLocaleString()}</b> positions in ${s.seconds.toFixed(2)} s. ` +
-    `Plain minimax would need about <b>${p.minimax_nodes.toLocaleString()}</b>: alpha-beta and pruning ` +
-    `searched 1 position for every ${p.one_in.toLocaleString()}.</p>`;
-  if (report.difficulty_choice) {
-    html += `<p class="hint">On this level the AI sometimes plays a weaker move on purpose: it found ` +
-      `<b>${report.difficulty_choice.intended_san}</b> best but played ` +
-      `<b>${report.difficulty_choice.played_san}</b>.</p>`;
+  if (ply === app.thinkingPly && box.dataset.ply === String(ply)) return;
+  app.thinkingPly = ply;
+  let report = app.reports.get(ply);
+  if (!report) {
+    box.innerHTML = `<p class="empty">Loading the explanation…</p>`;
+    try {
+      report = await api(`/api/games/${s.id}/analysis/${ply}`);
+      app.reports.set(ply, report);
+    } catch (err) {
+      box.innerHTML = `<p class="empty">${err.message}</p>`;
+      return;
+    }
+    if (app.thinkingPly !== ply) return; // the user moved on meanwhile
   }
-  box.innerHTML = html;
+  const rec = s.game.history[ply - 1];
+  const label = rec ? `AI move ${rec.move_number}${rec.color === "white" ? "." : "…"} ${rec.san}` : "";
+  renderThinking(box, report, { onTree: openTree, moveLabel: label });
+  box.dataset.ply = String(ply);
 }
+
+// ---------------------------------------------------------------- search tree viewer
+
+let treePly = null;
+
+async function openTree(ply) {
+  treePly = ply;
+  const dlg = $("dlg-tree");
+  if (!dlg.open) dlg.showModal();
+  await loadTree();
+}
+
+async function loadTree() {
+  const host = $("tree-host");
+  const detail = $("tree-detail");
+  host.innerHTML = `<p class="empty">Building the tree…</p>`;
+  detail.innerHTML = "";
+  const depth = $("tree-depth").value, breadth = $("tree-breadth").value;
+  try {
+    const t = await api(`/api/games/${app.state.id}/tree?ply=${treePly}&depth=${depth}&breadth=${breadth}`);
+    $("tree-summary").innerHTML =
+      `Best move <b>${t.best_san}</b> (${t.value_text}). Alpha-beta visited <b>${t.visited}</b> of ` +
+      `${t.total} positions in this tree: <b>${t.pruned_pct}%</b> were skipped, with the same answer as plain minimax.`;
+    drawTree(host, $("tree-rows"), t, (node) => { detail.innerHTML = describeNode(node); });
+  } catch (err) {
+    host.innerHTML = `<p class="empty">${err.message}</p>`;
+  }
+}
+
+$("tree-depth").addEventListener("change", loadTree);
+$("tree-breadth").addEventListener("change", loadTree);
+$("btn-tree-close").addEventListener("click", () => $("dlg-tree").close());
 
 // ---------------------------------------------------------------- rendering
 
@@ -279,6 +323,7 @@ function render(forceReset = false) {
   $("btn-draw").disabled = over || app.thinking;
 
   renderClocks();
+  updateThinking(ply);
 
   if (over && !app.wasOver) {
     app.wasOver = true;
@@ -391,6 +436,8 @@ $("btn-undo").addEventListener("click", async () => {
   try {
     const res = await api(`/api/games/${app.state.id}/undo`, { method: "POST" });
     app.viewPly = null;
+    for (const rec of res.undone) app.reports.delete(rec.ply);
+    app.thinkingPly = null;
     setState(res.state);
     render(true);
   } catch (err) { toast(err.message); }

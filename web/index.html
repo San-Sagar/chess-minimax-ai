@@ -167,6 +167,33 @@
     </div>
   </dialog>
 
+  <dialog id="dlg-tree" class="dialog wide">
+    <div class="tree-top">
+      <div>
+        <h2>Alpha-beta search tree</h2>
+        <p class="hint" id="tree-summary"></p>
+      </div>
+      <div class="tree-controls">
+        <label>Depth <select id="tree-depth"><option>2</option><option selected>3</option><option>4</option></select></label>
+        <label>Moves per position <select id="tree-breadth"><option>2</option><option selected>3</option><option>4</option></select></label>
+        <button class="btn" id="btn-tree-close" type="button">Close</button>
+      </div>
+    </div>
+    <p class="hint">A small version of the real search, built the same way: the best few moves at each
+      position, searched with minimax and alpha-beta. Click any box to see what happened there.</p>
+    <div class="tree-legend">
+      <span><i class="lg best"></i>best line</span><span><i class="lg cut"></i>caused a cutoff</span>
+      <span><i class="lg pruned"></i>skipped (pruned)</span>
+    </div>
+    <div class="tree-body">
+      <div class="tree-scrollwrap">
+        <div class="tree-rows" id="tree-rows"></div>
+        <div class="tree-host" id="tree-host"><p class="empty">Building the tree…</p></div>
+      </div>
+      <aside class="tree-detail" id="tree-detail"></aside>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="alert" hidden></div>
 
   <script type="module" src="js/app.js"></script>
