@@ -1,6 +1,6 @@
 """Tests for the game layer (chess_ai.game)."""
 
-import chess
+from chess_ai import chess
 import pytest
 
 from chess_ai.game import BLACK, WHITE, Game, IllegalMoveError

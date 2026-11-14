@@ -16,7 +16,7 @@ import csv
 import time
 from dataclasses import replace
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine import evaluation
 from chess_ai.engine.search import SearchConfig, Searcher

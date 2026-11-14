@@ -18,7 +18,7 @@ import os
 import time
 from concurrent.futures import ProcessPoolExecutor
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.search import SearchConfig, Searcher
 from chess_ai.game import Game

@@ -2,7 +2,7 @@
 
 import json
 
-import chess
+from chess_ai import chess
 import pytest
 
 from chess_ai.engine.analysis import analyze_move, estimate_pruning

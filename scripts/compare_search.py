@@ -15,7 +15,7 @@ import argparse
 import csv
 import time
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.classic import alphabeta, minimax
 from chess_ai.engine.search import SearchConfig, Searcher

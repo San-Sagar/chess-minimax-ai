@@ -1,7 +1,7 @@
 """Game layer: one game of chess between a human and the AI.
 
-This wraps python-chess's ``chess.Board`` (which handles the raw rules and legal
-move generation) and adds what the rest of the project needs:
+This wraps our own rules engine's ``chess.Board`` (``chess_ai.chess``: board, legal
+move generation, FEN, SAN) and adds what the rest of the project needs:
 
 * a move history of :class:`MoveRecord` objects (who moved what, captures, checks...)
 * making moves from UCI (``"e2e4"``), SAN (``"e4"``, ``"Nf3"``) or ``chess.Move``
@@ -17,11 +17,9 @@ this class is for the game being played, the server and the UI.
 from __future__ import annotations
 
 import datetime as _dt
-import io
 from dataclasses import asdict, dataclass
 
-import chess
-import chess.pgn
+from chess_ai import chess
 
 WHITE = "white"
 BLACK = "black"
@@ -35,7 +33,7 @@ PIECE_VALUES = {  # simple material values used for the "+3" style balance in th
     chess.KING: 0,
 }
 
-# Map python-chess terminations to the names used by the API / UI.
+# Map rule-engine terminations to the names used by the API / UI.
 _TERMINATION_NAMES = {
     chess.Termination.CHECKMATE: "checkmate",
     chess.Termination.STALEMATE: "stalemate",
@@ -154,7 +152,7 @@ class Game:
         outcome = board.outcome(claim_draw=False)
         if outcome is None:
             # Claimable draws are applied automatically, but only once they have actually
-            # happened. (python-chess's claim_draw=True also counts a draw that one more
+            # happened. (A "can claim" rule would also count a draw that one more
             # move *would* reach, which would end the game a move too early.)
             if board.is_repetition(3):
                 return GameStatus(True, "threefold_repetition", None, "1/2-1/2")
@@ -311,8 +309,8 @@ class Game:
         """Material on the board, White minus Black, in pawns (e.g. +3 = White up a piece)."""
         total = 0
         for piece_type, value in PIECE_VALUES.items():
-            total += value * len(self._board.pieces(piece_type, chess.WHITE))
-            total -= value * len(self._board.pieces(piece_type, chess.BLACK))
+            total += value * chess.popcount(self._board.pieces_mask(piece_type, chess.WHITE))
+            total -= value * chess.popcount(self._board.pieces_mask(piece_type, chess.BLACK))
         return total
 
     # ------------------------------------------------------------------ FEN / PGN
@@ -324,13 +322,9 @@ class Game:
     @classmethod
     def from_pgn(cls, pgn_text: str) -> Game:
         """Load a game from PGN text (main line only), replaying every move."""
-        parsed = chess.pgn.read_game(io.StringIO(pgn_text))
-        if parsed is None:
-            raise ValueError("no game found in PGN text")
-        if parsed.errors:
-            raise ValueError(f"PGN contains errors: {parsed.errors[0]}")
-        game = cls(parsed.board().fen())
-        for move in parsed.mainline_moves():
+        parsed = chess.pgn.read_pgn(pgn_text)  # raises ValueError for broken PGN
+        game = cls(parsed.start_fen)
+        for move in parsed.moves:
             game.make_move(move)
         return game
 
@@ -341,22 +335,19 @@ class Game:
         event: str = "Human vs AI",
     ) -> str:
         """Export the game as PGN text (loadable in Lichess, chess.com, Arena...)."""
-        pgn = chess.pgn.Game()
-        pgn.headers["Event"] = event
-        pgn.headers["Site"] = "Chess Minimax AI"
-        pgn.headers["Date"] = _dt.date.today().strftime("%Y.%m.%d")
-        pgn.headers["White"] = white
-        pgn.headers["Black"] = black
-        if self.start_fen != chess.STARTING_FEN:
-            pgn.setup(chess.Board(self.start_fen))
-        node: chess.pgn.GameNode = pgn
-        for rec in self._history:
-            node = node.add_variation(chess.Move.from_uci(rec.uci))
         status = self.status()
-        pgn.headers["Result"] = status.result
+        headers = {
+            "Event": event,
+            "Site": "Chess Minimax AI",
+            "Date": _dt.date.today().strftime("%Y.%m.%d"),
+            "Round": "-",
+            "White": white,
+            "Black": black,
+        }
         if status.reason:
-            pgn.headers["Termination"] = status.reason
-        return str(pgn)
+            headers["Termination"] = status.reason
+        moves = [chess.Move.from_uci(rec.uci) for rec in self._history]
+        return chess.pgn.write_pgn(headers, moves, self.start_fen, status.result)
 
     # ------------------------------------------------------------------ serialisation
 

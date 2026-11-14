@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.perft import REFERENCE_POSITIONS, divide, timed_perft
 

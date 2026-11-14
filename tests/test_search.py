@@ -2,7 +2,7 @@
 
 import time
 
-import chess
+from chess_ai import chess
 import pytest
 
 from chess_ai.engine.classic import MATE_SCORE, alphabeta, minimax

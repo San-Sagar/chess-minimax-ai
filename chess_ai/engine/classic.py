@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.evaluation import evaluate
 
@@ -46,7 +46,7 @@ def is_draw(board: chess.Board) -> bool:
 def white_eval(board: chess.Board, ply: int) -> int:
     """Score of a leaf position from White's point of view.
 
-    A checkmate is recognised even at the leaf (cheap: python-chess only looks for
+    A checkmate is recognised even at the leaf (cheap: ``is_checkmate`` only looks for
     legal moves when the side to move is in check), so a mate in 1 is found at depth 1.
     """
     if board.is_checkmate():

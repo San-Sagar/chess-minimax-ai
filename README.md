@@ -4,6 +4,11 @@ A chess engine written in Python that chooses its moves with the **minimax algor
 and **alpha-beta pruning**, with a web interface where a human plays against it and
 can see *why* the AI chose each move.
 
+**Everything is written from scratch for this project:** the chess rules (bitboard
+board, legal move generation, FEN/SAN/PGN), the evaluation function, minimax, alpha-beta
+and all search techniques, and the opening book. No chess library or downloaded chess
+data is used. The move generator is verified with perft against the published counts.
+
 ## Features (planned)
 
 - **Human vs AI:** pick a colour, difficulty and clock; undo, resign, flip board
@@ -20,14 +25,16 @@ can see *why* the AI chose each move.
 
 ```
 chess_ai/
+  chess/     the rules of chess: bitboards, attacks, legal moves, FEN, SAN, PGN
   game.py    game layer: moves, history, undo, endings, FEN/PGN
-  engine/    evaluation function, minimax / alpha-beta search, move ordering, TT, perft
+  engine/    evaluation, minimax / alpha-beta search, move ordering, TT, opening book,
+             move analysis, search-tree recorder, perft
   explain/   turns search data into the AI Thinking narrative and tree viewer data
   server/    FastAPI backend (REST + WebSocket)
 web/         frontend (board, panels, Learn page)
 tests/       pytest test-suite
 docs/        project report material
-data/        opening books and endgame tablebases (not committed)
+data/        scratch output (not committed)
 scripts/     benchmarking and strength-testing scripts
 ```
 
@@ -36,12 +43,12 @@ scripts/     benchmarking and strength-testing scripts
 | Phase | Work |
 |---|---|
 | 0 | Project setup ✅ |
-| 1 | Rules (python-chess) ✅ |
+| 1 | Rules: own bitboard move generator, FEN/SAN/PGN ✅ |
 | 2 | Evaluation function ✅ |
 | 3 | Minimax → alpha-beta → iterative deepening → quiescence ✅ |
 | 4 | Search speed-ups (move ordering, transposition table, pruning) ✅ |
 | 5 | Search data recording ✅ |
-| 6 | Opening book + endgame tablebases |
+| 6 | Curated opening book + opening names ✅ |
 | 7 | Backend API |
 | 8 | Board, move history, evaluation panel |
 | 9 | AI Thinking panel + search tree viewer |

@@ -38,7 +38,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field, fields, replace
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.classic import INFINITY, MATE_SCORE
 from chess_ai.engine.evaluation import evaluate
@@ -46,8 +46,6 @@ from chess_ai.engine.tables import MG_VALUE
 
 MAX_PLY = 128
 MATE_THRESHOLD = MATE_SCORE - MAX_PLY  # scores beyond this are "mate in N"
-TB_WIN = 20_000  # tablebase-proven win (below mate scores, above any evaluation)
-TB_THRESHOLD = TB_WIN - MAX_PLY
 _TIME_CHECK_EVERY = 1024  # nodes between clock checks
 
 # Transposition-table entry flags: what the stored score means.
@@ -109,18 +107,11 @@ def mate_in(score: int) -> int | None:
     return moves if score > 0 else -moves
 
 
-def is_tablebase_score(score: int) -> bool:
-    return TB_THRESHOLD <= abs(score) < MATE_THRESHOLD
-
-
 def format_score(score: int) -> str:
-    """'+0.35', '-1.20', '#3' (mate in 3), '#-2' (getting mated in 2),
-    'TB win' / 'TB loss' (proven by the endgame tablebase)."""
+    """'+0.35', '-1.20', '#3' (mate in 3), '#-2' (getting mated in 2)."""
     m = mate_in(score)
     if m is not None:
         return f"#{m}"
-    if is_tablebase_score(score):
-        return "TB win" if score > 0 else "TB loss"
     return f"{score / 100:+.2f}"
 
 
@@ -136,7 +127,6 @@ class SearchStats:
     reductions: int = 0  # late-move reductions applied
     researches: int = 0  # PVS / LMR / aspiration re-searches
     futility_prunes: int = 0
-    tb_hits: int = 0  # positions answered exactly by the endgame tablebase
 
     def to_dict(self) -> dict:
         return {f.name: getattr(self, f.name) for f in fields(self)}
@@ -233,10 +223,10 @@ def mvv_lva(board: chess.Board, move: chess.Move) -> int:
 
 
 def _position_key(board: chess.Board):
-    """Hashable identity of a position (pieces, side to move, castling, en passant).
-    python-chess uses this same key for its repetition detection; it plays the role
-    of a Zobrist hash and is much faster in Python than computing one."""
-    return board._transposition_key()
+    """Hashable identity of a position (pieces, side to move, castling, en passant):
+    a tuple of the board's bitboards. Python hashes it quickly, so it plays the role of
+    a Zobrist hash (which would be slower to update move by move in pure Python)."""
+    return board.position_key()
 
 
 def _has_non_pawn_material(board: chess.Board, color: chess.Color) -> bool:
@@ -250,19 +240,19 @@ def _insufficient_material(board: chess.Board) -> bool:
 
 
 def _to_tt(score: int, ply: int) -> int:
-    """Mate and tablebase scores depend on the distance from the root; store them
-    relative to the stored position instead, so they stay right when reused."""
-    if score >= TB_THRESHOLD:
+    """Mate scores depend on the distance from the root; store them relative to the
+    stored position instead, so they stay right when reused."""
+    if score >= MATE_THRESHOLD:
         return score + ply
-    if score <= -TB_THRESHOLD:
+    if score <= -MATE_THRESHOLD:
         return score - ply
     return score
 
 
 def _from_tt(score: int, ply: int) -> int:
-    if score >= TB_THRESHOLD:
+    if score >= MATE_THRESHOLD:
         return score - ply
-    if score <= -TB_THRESHOLD:
+    if score <= -MATE_THRESHOLD:
         return score + ply
     return score
 
@@ -281,10 +271,8 @@ class Searcher:
     (call :meth:`new_game` to clear it).
     """
 
-    def __init__(self, config: SearchConfig | None = None, tablebase=None, **overrides) -> None:
+    def __init__(self, config: SearchConfig | None = None, **overrides) -> None:
         self.config = replace(config or SearchConfig(), **overrides)
-        # Optional chess_ai.engine.tablebase.Tablebase: exact results in the endgame.
-        self.tablebase = tablebase if (tablebase is not None and tablebase.available) else None
         self.stats = SearchStats()
         self._tt: dict = {}
         self._history = [[0] * 4096 for _ in range(2)]  # [color][from*64 + to]
@@ -463,18 +451,6 @@ class Searcher:
                 return 0
             if hm >= 4 and key in self._path[-hm:]:
                 return 0
-            # Endgame tablebase: probed right after a capture or pawn move (the only
-            # moments a position can newly enter the tables), so probes stay rare.
-            tb = self.tablebase
-            if tb is not None and hm == 0 and tb.covers(board):
-                wdl = tb.probe_wdl(board)
-                if wdl is not None:
-                    stats.tb_hits += 1
-                    if wdl >= 2:
-                        return TB_WIN - ply
-                    if wdl <= -2:
-                        return -TB_WIN + ply
-                    return 0  # draw (or a win/loss spoiled by the 50-move rule)
         if ply >= MAX_PLY:
             return evaluate(board)
 

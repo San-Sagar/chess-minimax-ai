@@ -11,7 +11,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 
-import chess
+from chess_ai import chess
 
 
 def perft(board: chess.Board, depth: int) -> int:

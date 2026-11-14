@@ -3,7 +3,7 @@
 Depths are capped so the whole suite stays fast; scripts/perft.py runs deeper.
 """
 
-import chess
+from chess_ai import chess
 import pytest
 
 from chess_ai.engine.perft import REFERENCE_POSITIONS, divide, perft

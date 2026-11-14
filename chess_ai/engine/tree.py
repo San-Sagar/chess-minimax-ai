@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.classic import INFINITY, MATE_SCORE
 from chess_ai.engine.evaluation import evaluate

@@ -13,7 +13,7 @@ import argparse
 import json
 import time
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.analysis import analyze_move
 from chess_ai.engine.evaluation import TERM_LABELS

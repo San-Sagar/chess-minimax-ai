@@ -5,7 +5,7 @@ Most tests compare two positions that differ in one idea (e.g. passed pawn on th
 catches the classic bug of a table being read upside-down for one colour.
 """
 
-import chess
+from chess_ai import chess
 import pytest
 
 from chess_ai.engine.evaluation import (

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import argparse
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.search import IterationInfo, Searcher
 from chess_ai.game import BLACK, WHITE, Game, IllegalMoveError

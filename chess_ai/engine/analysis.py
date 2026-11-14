@@ -22,7 +22,7 @@ import math
 import time
 from dataclasses import dataclass, field
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.classic import MATE_SCORE
 from chess_ai.engine.evaluation import TERMS, EvalBreakdown, compare, evaluate_breakdown

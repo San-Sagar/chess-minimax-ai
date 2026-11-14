@@ -30,7 +30,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.tables import (
     BISHOP, EG_VALUE, KING, KNIGHT, MAX_PHASE, MG_VALUE, PAWN, PHASE_WEIGHT,
@@ -338,7 +338,7 @@ def evaluate(board: chess.Board) -> int:
     the breakdown objects, and cached: the search meets the same positions often.
     Checkmate / stalemate / draws are handled by the search, not here.
     """
-    key = board._transposition_key()  # pieces + side to move + castling + en passant
+    key = board.position_key()  # pieces + side to move + castling + en passant
     cached = _EVAL_CACHE.get(key)
     if cached is not None:
         return cached

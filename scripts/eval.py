@@ -12,7 +12,7 @@ from __future__ import annotations
 import argparse
 import time
 
-import chess
+from chess_ai import chess
 
 from chess_ai.engine.evaluation import TERM_LABELS, evaluate, evaluate_breakdown
 

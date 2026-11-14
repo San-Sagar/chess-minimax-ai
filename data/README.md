@@ -1,7 +1,7 @@
 # data/
 
-Large chess data files live here and are **not committed to git** (see `.gitignore`).
-They are added in Phase 6:
+Scratch space for large generated files (match PGNs, benchmark output). Its contents
+are **not committed to git** (see `.gitignore`).
 
-- `book.bin`: Polyglot opening book
-- `syzygy/`: Syzygy endgame tablebases (3-5 piece)
+The engine needs nothing from here: the rules, the opening book and the AI are all in
+the source code.

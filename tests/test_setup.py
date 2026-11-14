@@ -1,8 +1,15 @@
 """Phase 0 smoke tests: the package imports and the dependencies work."""
 
-import chess
+import importlib.util
 
 import chess_ai
+from chess_ai import chess
+
+
+def test_no_outside_chess_library():
+    """The project implements chess itself: python-chess must not be installed/used."""
+    assert importlib.util.find_spec("chess") is None
+    assert chess.__name__ == "chess_ai.chess"
 
 
 def test_package_imports():

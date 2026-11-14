@@ -16,7 +16,7 @@ rank 8** and the last row is rank 1, files a to h left to right. See ``pst_index
 
 from __future__ import annotations
 
-import chess
+from chess_ai import chess
 
 PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING = (
     chess.PAWN, chess.KNIGHT, chess.BISHOP, chess.ROOK, chess.QUEEN, chess.KING,
@@ -125,7 +125,7 @@ PST_EG = {PAWN: PAWN_EG, KNIGHT: KNIGHT_PST, BISHOP: BISHOP_PST,
 def pst_index(square: chess.Square, color: chess.Color) -> int:
     """Index into a table for a piece of ``color`` on ``square``.
 
-    python-chess numbers squares a1=0 ... h8=63, but tables list rank 8 first.
+    The board numbers squares a1=0 ... h8=63, but tables list rank 8 first.
     For White we flip the rank (``square ^ 56``). Black sees the board from the
     other side, so the un-flipped square already gives the mirrored entry.
     """
