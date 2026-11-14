@@ -37,7 +37,7 @@ scripts/     benchmarking and strength-testing scripts
 |---|---|
 | 0 | Project setup ✅ |
 | 1 | Rules (python-chess) ✅ |
-| 2 | Evaluation function |
+| 2 | Evaluation function ✅ |
 | 3 | Minimax → alpha-beta → iterative deepening → quiescence |
 | 4 | Search speed-ups (move ordering, transposition table, pruning) |
 | 5 | Search data recording |
@@ -55,6 +55,13 @@ scripts/     benchmarking and strength-testing scripts
 py -3.11 -m venv .venv
 .venv\Scripts\python -m pip install -e ".[dev]"
 .venv\Scripts\python -m pytest
+```
+
+## Inspect the evaluation
+
+```powershell
+.venv\Scripts\python scripts\eval.py --moves e4 e5 Nf3 Nc6   # term-by-term breakdown
+.venv\Scripts\python scripts\eval.py --bench                 # evaluations per second
 ```
 
 ## Verify move generation (perft)
