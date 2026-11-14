@@ -20,7 +20,8 @@ can see *why* the AI chose each move.
 
 ```
 chess_ai/
-  engine/    evaluation function, minimax / alpha-beta search, move ordering, TT
+  game.py    game layer: moves, history, undo, endings, FEN/PGN
+  engine/    evaluation function, minimax / alpha-beta search, move ordering, TT, perft
   explain/   turns search data into the AI Thinking narrative and tree viewer data
   server/    FastAPI backend (REST + WebSocket)
 web/         frontend (board, panels, Learn page)
@@ -34,10 +35,10 @@ scripts/     benchmarking and strength-testing scripts
 
 | Phase | Work |
 |---|---|
-| 0 | Project setup âœ… |
+| 0 | Project setup ✅ |
 | 1 | Rules (python-chess) ✅ |
 | 2 | Evaluation function |
-| 3 | Minimax â†’ alpha-beta â†’ iterative deepening â†’ quiescence |
+| 3 | Minimax → alpha-beta → iterative deepening → quiescence |
 | 4 | Search speed-ups (move ordering, transposition table, pruning) |
 | 5 | Search data recording |
 | 6 | Opening book + endgame tablebases |
@@ -54,4 +55,10 @@ scripts/     benchmarking and strength-testing scripts
 py -3.11 -m venv .venv
 .venv\Scripts\python -m pip install -e ".[dev]"
 .venv\Scripts\python -m pytest
+```
+
+## Verify move generation (perft)
+
+```powershell
+.venv\Scripts\python scripts\perft.py --depth 4
 ```
