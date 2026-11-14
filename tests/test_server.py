@@ -90,6 +90,17 @@ def test_draw_offer():
                             fen="4k3/8/8/8/8/8/8/3QK3 w - - 0 1")
     assert ai_losing.offer_draw(think_time=0.2)["accepted"]
     assert ai_losing.game.status().reason == "draw_agreed"
+    early_equal = GameSession(human_color=WHITE, level="easy")  # move 1: plays on
+    assert not early_equal.offer_draw(think_time=0.2)["accepted"]
+    late_equal = GameSession(human_color=WHITE, level="easy",
+                             fen="4k3/pppp4/8/8/8/8/PPPP4/4K3 w - - 0 40")
+    assert late_equal.offer_draw(think_time=0.2)["accepted"]
+
+
+def test_final_position_eval_is_mate_or_draw():
+    s = GameSession(human_color=WHITE, level="easy", fen="6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 30")
+    s.human_move("Ra8#")
+    assert s.state()["evals"] == [100000]  # White has mated
 
 
 def test_unknown_level_and_colour_rejected():

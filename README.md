@@ -50,7 +50,7 @@ scripts/     benchmarking and strength-testing scripts
 | 5 | Search data recording ✅ |
 | 6 | Curated opening book + opening names ✅ |
 | 7 | Backend API (REST + WebSocket live thinking) ✅ |
-| 8 | Board, move history, evaluation panel |
+| 8 | Board, move history, evaluation panel (own HTML/CSS/JS, no libraries) ✅ |
 | 9 | AI Thinking panel + search tree viewer |
 | 10 | Learn page |
 | 11 | Strength testing |
@@ -69,6 +69,11 @@ py -3.11 -m venv .venv
 ```powershell
 .venv\Scripts\python -m chess_ai.server            # http://127.0.0.1:8000
 ```
+
+Open http://127.0.0.1:8000 to play. The page (`web/`) is plain HTML, CSS and JavaScript
+modules written for this project: `board.js` (board, animation, drag and drop, promotion),
+`panels.js` (move history, eval bar, score graph, live search), `app.js` (game flow),
+`sound.js` (move sounds made with the Web Audio API).
 
 API docs (interactive) at http://127.0.0.1:8000/docs. Main endpoints: `POST /api/games`,
 `POST /api/games/{id}/move`, `POST /api/games/{id}/ai-move`, `GET /api/games/{id}/tree`,

@@ -19,6 +19,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass
 
 from chess_ai import chess
+from chess_ai.engine.classic import MATE_SCORE
 from chess_ai.engine.engine import Engine
 from chess_ai.engine.search import IterationInfo, Searcher, format_score
 from chess_ai.engine.tree import record_tree
@@ -162,6 +163,15 @@ class GameSession:
         if self.clock is not None and self.game.is_over:
             self.clock.stopped = True
 
+    def _final_eval(self) -> int | None:
+        """Score (White's view) when the game has ended on the board: mate or 0."""
+        status = self.game.status()
+        if not status.is_over:
+            return None
+        if status.winner is None:
+            return 0
+        return MATE_SCORE if status.winner == WHITE else -MATE_SCORE
+
     def _charge_clock(self, mover: str) -> None:
         if self.clock is not None:
             self.clock.moved(mover)
@@ -185,6 +195,10 @@ class GameSession:
                         else None),
             "evals": [self.evals.get(p) for p in range(1, last_ply + 1)],
             "ai_plies": sorted(self.reports),
+            "ai_moves": {str(p): {"source": r["source"], "score_text": r["score_text"],
+                                  "seconds": r["seconds"],
+                                  "weaker_on_purpose": bool(r.get("difficulty_choice"))}
+                         for p, r in self.reports.items()},
             "last_ai_move": _summary(last_report) if last_report else None,
             "ai_to_move": self.ai_to_move,
             "thinking": self.thinking,
@@ -204,7 +218,7 @@ class GameSession:
             if self.clock is not None and self.clock.started_at is None:
                 self.clock.start(self.human)
             self._charge_clock(self.human)
-            self.evals.setdefault(rec.ply, None)
+            self.evals[rec.ply] = self._final_eval()
             return rec.to_dict()
 
     def ai_move(self, on_iteration: Callable[[dict], None] | None = None) -> dict:
@@ -264,7 +278,8 @@ class GameSession:
                           fen_after=rec.fen_after, level=level.name)
             self.reports[rec.ply] = report
             score_white = _white_view(report["score"], self.ai)
-            self.evals[rec.ply] = score_white
+            final = self._final_eval()
+            self.evals[rec.ply] = final if self.game.is_over else score_white
             if rec.ply - 1 >= 1 and self.evals.get(rec.ply - 1) is None and \
                     reply.source == "search" and intended is None:
                 # the AI's search score is also its judgement of the human's last move
@@ -300,7 +315,8 @@ class GameSession:
             return self.game.resign(self.human).to_dict()
 
     def offer_draw(self, think_time: float = 0.5) -> dict:
-        """The AI accepts a draw if it does not think it is better."""
+        """The AI accepts a draw if it is clearly worse, or (from move 20 on) if it
+        does not think it is better. Early in the game it prefers to play on."""
         with self.lock:
             if self.game.is_over:
                 raise SessionError("the game is over")
@@ -311,14 +327,20 @@ class GameSession:
             ai_is_white = self.ai == WHITE
             # r.score is from the side to move's view; convert it to the AI's view
             ai_score = r.score if board.turn == ai_is_white else -r.score
-            accepted = ai_score <= 25  # equal (within a quarter pawn) or worse for the AI
+            early = board.fullmove_number < 20
+            if ai_score <= -50:
+                accepted, reason = True, "The AI thinks it is worse, so it accepts."
+            elif early:
+                accepted, reason = False, ("It is too early: the AI is not worse, "
+                                           "so it wants to play on.")
+            elif ai_score <= 25:  # equal (within a quarter pawn)
+                accepted, reason = True, "The AI thinks the position is equal, so it accepts."
+            else:
+                accepted, reason = False, "The AI thinks it is better, so it plays on."
             if accepted:
                 self.game.agree_draw()
             return {"accepted": accepted, "ai_score": ai_score,
-                    "ai_score_text": format_score(ai_score),
-                    "reason": ("The AI thinks the position is equal or worse for it, "
-                               "so it accepts." if accepted else
-                               "The AI thinks it is better, so it plays on.")}
+                    "ai_score_text": format_score(ai_score), "reason": reason}
 
     # ------------------------------------------------------------ views
 
