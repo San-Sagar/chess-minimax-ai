@@ -33,9 +33,12 @@ def show(board: chess.Board) -> None:
 
 
 def bench(board: chess.Board, seconds: float = 2.0) -> None:
+    from chess_ai.engine import evaluation
+
     n, start = 0, time.perf_counter()
     while time.perf_counter() - start < seconds:
         for _ in range(200):
+            evaluation._EVAL_CACHE.clear()  # measure real work, not cache hits
             evaluate(board)
         n += 200
     elapsed = time.perf_counter() - start

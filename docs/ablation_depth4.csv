@@ -1,0 +1,10 @@
+technique,depth,nodes,fraction_of_phase3,seconds
+Alpha-beta + quiescence (Phase 3),4,702554,1.0,41.16
++ move ordering,4,216630,0.3083,13.73
++ transposition table,4,144361,0.2055,10.06
++ principal variation search,4,74020,0.1054,4.93
++ aspiration windows,4,73802,0.105,4.87
++ null-move pruning,4,53841,0.0766,3.46
++ late move reductions,4,19683,0.028,1.25
++ futility pruning,4,14736,0.021,0.95
++ check extension (full engine),4,15392,0.0219,1.0

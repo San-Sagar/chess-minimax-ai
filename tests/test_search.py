@@ -6,7 +6,9 @@ import chess
 import pytest
 
 from chess_ai.engine.classic import MATE_SCORE, alphabeta, minimax
-from chess_ai.engine.search import Searcher, format_score, mate_in
+from chess_ai.engine.search import SearchConfig, Searcher, format_score, mate_in
+
+TEXTBOOK = SearchConfig.textbook()
 
 POSITIONS = [
     chess.STARTING_FEN,
@@ -31,11 +33,33 @@ def test_minimax_alphabeta_and_engine_agree(fen, depth):
     board = chess.Board(fen)
     mm = minimax(board, depth)
     ab = alphabeta(board, depth)
-    eng = Searcher(quiescence=False).search(board, max_depth=depth)
+    eng = Searcher(TEXTBOOK).search(board, max_depth=depth)
     assert ab.score == mm.score
     assert white_view(board, eng.score) == mm.score
     assert ab.nodes <= mm.nodes
     assert board.fen() == fen  # caller's board untouched
+
+
+@pytest.mark.parametrize("fen", POSITIONS)
+def test_ordering_pvs_and_aspiration_do_not_change_the_score(fen):
+    """These techniques only change the *order* and *window* of the search: the
+    minimax value at a fixed depth must stay exactly the same."""
+    board = chess.Board(fen)
+    exact = Searcher(TEXTBOOK).search(board, max_depth=4)
+    cfg = SearchConfig(quiescence=False, move_ordering=True, pvs=True, aspiration=True,
+                       transposition_table=False, null_move=False,
+                       late_move_reductions=False, futility=False, check_extension=False)
+    fast = Searcher(cfg).search(board, max_depth=4)
+    assert fast.score == exact.score
+    assert fast.stats.nodes < exact.stats.nodes
+
+
+def test_textbook_config_turns_everything_off():
+    cfg = SearchConfig.textbook()
+    assert not any([cfg.quiescence, cfg.move_ordering, cfg.transposition_table, cfg.pvs,
+                    cfg.null_move, cfg.late_move_reductions, cfg.futility,
+                    cfg.check_extension, cfg.aspiration])
+    assert SearchConfig.phase3().quiescence
 
 
 def test_alphabeta_prunes_a_lot():
@@ -101,13 +125,57 @@ def test_quiescence_avoids_horizon_blunder():
     loses the queen to exd5. Quiescence search sees the recapture."""
     board = chess.Board("4k3/8/4p3/3p4/8/8/8/3QK3 w - - 0 1")
     blunder = chess.Move.from_uci("d1d5")
-    assert Searcher(quiescence=False).search(board, max_depth=1).best_move == blunder
-    assert Searcher(quiescence=True).search(board, max_depth=1).best_move != blunder
+    assert Searcher(TEXTBOOK).search(board, max_depth=1).best_move == blunder
+    assert Searcher(SearchConfig.phase3()).search(board, max_depth=1).best_move != blunder
+    assert Searcher().search(board, max_depth=1).best_move != blunder
 
 
 def test_wins_hanging_piece():
     board = chess.Board("4k3/8/8/3q4/8/8/3R4/4K3 w - - 0 1")  # black queen undefended
     assert Searcher().search(board, max_depth=2).best_move == chess.Move.from_uci("d2d5")
+
+
+@pytest.mark.parametrize(("fen", "best"), [
+    ("r3k3/8/8/1N6/8/8/8/4K3 w - - 0 1", "b5c7"),  # knight fork: king + rook
+    ("4k3/8/8/3q4/8/8/3R4/4K3 w - - 0 1", "d2d5"),  # free queen
+    ("6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1", "a1a8"),  # back-rank mate
+])
+def test_full_engine_tactics(fen, best):
+    assert Searcher().search(chess.Board(fen), max_depth=4).best_move.uci() == best
+
+
+# --------------------------------------------------------------- techniques
+
+
+def test_transposition_table_reused_between_searches():
+    board = chess.Board(POSITIONS[1])
+    s = Searcher()
+    first = s.search(board, max_depth=4)
+    second = s.search(board, max_depth=4)
+    assert second.stats.tt_hits > 0
+    assert second.stats.nodes < first.stats.nodes
+    s.new_game()
+    assert s.search(board, max_depth=4).stats.nodes > second.stats.nodes
+
+
+def test_full_engine_searches_fewer_nodes_than_phase3():
+    board = chess.Board(POSITIONS[1])
+    base = Searcher(SearchConfig.phase3()).search(board, max_depth=3)
+    full = Searcher().search(board, max_depth=3)
+    assert full.stats.nodes < base.stats.nodes / 2
+    assert full.stats.null_cutoffs + full.stats.tt_cutoffs + full.stats.reductions > 0
+
+
+def test_repetition_from_game_history_is_seen():
+    """Positions from the real game (before the root) count for repetition."""
+    board = chess.Board()
+    for san in ["Nf3", "Nf6", "Ng1", "Ng8", "Nf3", "Nf6"]:
+        board.push_san(san)
+    s = Searcher()
+    keys = s._game_history_keys(board)
+    assert len(keys) == 6
+    r = s.search(board, max_depth=3)
+    assert r.best_move is not None
 
 
 # --------------------------------------------------------------- deepening, time

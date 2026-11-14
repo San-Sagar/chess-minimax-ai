@@ -233,17 +233,40 @@ def _side_terms(
     pair = BISHOP_PAIR if chess.popcount(board.pieces_mask(BISHOP, color)) >= 2 else (0, 0)
     tempo = TEMPO if board.turn == color else (0, 0)
 
-    return {
-        "material": (mat_mg, mat_eg),
-        "piece_squares": (pst_mg, pst_eg),
-        "pawn_structure": (struct_mg, struct_eg),
-        "passed_pawns": (pass_mg, pass_eg),
-        "mobility": (mob_mg, mob_eg),
-        "king_safety": (king_mg, 0),
-        "bishop_pair": pair,
-        "rook_files": (rook_mg, rook_eg),
-        "tempo": tempo,
-    }, pressure
+    # Same order as TERMS (a plain list is faster than a dict in the search's hot path).
+    return [
+        (mat_mg, mat_eg),
+        (pst_mg, pst_eg),
+        (struct_mg, struct_eg),
+        (pass_mg, pass_eg),
+        (mob_mg, mob_eg),
+        (king_mg, 0),
+        pair,
+        (rook_mg, rook_eg),
+        tempo,
+    ], pressure
+
+
+_KING_SAFETY = TERMS.index("king_safety")
+
+
+def _all_terms(board: chess.Board):
+    """(phase, white terms, black terms), including the cross-wise king attack penalty."""
+    phase = game_phase(board)
+    white, white_pressure = _side_terms(board, chess.WHITE)
+    black, black_pressure = _side_terms(board, chess.BLACK)
+    # Each side's king safety loses points for the attacks the *other* side makes on it.
+    w_mg, w_eg = white[_KING_SAFETY]
+    white[_KING_SAFETY] = (
+        w_mg - _king_attack_penalty(black_pressure, bool(board.pieces_mask(QUEEN, chess.BLACK))),
+        w_eg,
+    )
+    b_mg, b_eg = black[_KING_SAFETY]
+    black[_KING_SAFETY] = (
+        b_mg - _king_attack_penalty(white_pressure, bool(board.pieces_mask(QUEEN, chess.WHITE))),
+        b_eg,
+    )
+    return phase, white, black
 
 
 def _taper(mg: int, eg: int, phase: int) -> int:
@@ -294,35 +317,42 @@ class EvalBreakdown:
 
 
 def evaluate_breakdown(board: chess.Board) -> EvalBreakdown:
-    phase = game_phase(board)
-    white, white_pressure = _side_terms(board, chess.WHITE)
-    black, black_pressure = _side_terms(board, chess.BLACK)
-    # Each side's king-safety loses points for the attacks the *other* side makes on it.
-    w_mg, w_eg = white["king_safety"]
-    white["king_safety"] = (
-        w_mg - _king_attack_penalty(black_pressure, bool(board.pieces_mask(QUEEN, chess.BLACK))),
-        w_eg,
-    )
-    b_mg, b_eg = black["king_safety"]
-    black["king_safety"] = (
-        b_mg - _king_attack_penalty(white_pressure, bool(board.pieces_mask(QUEEN, chess.WHITE))),
-        b_eg,
-    )
+    phase, white, black = _all_terms(board)
     return EvalBreakdown(
         phase=phase,
         terms={
-            name: TermScore(_taper(*white[name], phase), _taper(*black[name], phase))
-            for name in TERMS
+            name: TermScore(_taper(*white[i], phase), _taper(*black[i], phase))
+            for i, name in enumerate(TERMS)
         },
     )
+
+
+_EVAL_CACHE: dict = {}
+_EVAL_CACHE_MAX = 500_000
 
 
 def evaluate(board: chess.Board) -> int:
     """Score in centipawns from the **side to move's** point of view (negamax style).
 
+    Exactly ``evaluate_breakdown(board).for_side(board.turn)``, but without building
+    the breakdown objects, and cached: the search meets the same positions often.
     Checkmate / stalemate / draws are handled by the search, not here.
     """
-    return evaluate_breakdown(board).for_side(board.turn)
+    key = board._transposition_key()  # pieces + side to move + castling + en passant
+    cached = _EVAL_CACHE.get(key)
+    if cached is not None:
+        return cached
+    phase, white, black = _all_terms(board)
+    inv = MAX_PHASE - phase
+    total = 0
+    for (w_mg, w_eg), (b_mg, b_eg) in zip(white, black):
+        total += ((w_mg * phase + w_eg * inv) // MAX_PHASE
+                  - (b_mg * phase + b_eg * inv) // MAX_PHASE)
+    score = total if board.turn == chess.WHITE else -total
+    if len(_EVAL_CACHE) >= _EVAL_CACHE_MAX:
+        _EVAL_CACHE.clear()
+    _EVAL_CACHE[key] = score
+    return score
 
 
 def compare(before: EvalBreakdown, after: EvalBreakdown) -> dict[str, int]:

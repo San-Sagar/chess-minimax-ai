@@ -46,6 +46,25 @@ def test_breakdown_matches_evaluate(fen):
     assert b.total == sum(t.net for t in b.terms.values())
 
 
+def test_fast_evaluate_matches_breakdown_in_random_games():
+    """evaluate() has its own fast path + cache; it must always equal the breakdown."""
+    import random
+
+    rng = random.Random(1234)
+    checked = 0
+    for _ in range(30):
+        board = chess.Board()
+        for _ in range(rng.randint(10, 80)):
+            moves = list(board.legal_moves)
+            if not moves:
+                break
+            board.push(rng.choice(moves))
+            assert evaluate(board) == evaluate_breakdown(board).for_side(board.turn)
+            assert evaluate(board.mirror()) == evaluate(board)  # also symmetric
+            checked += 1
+    assert checked > 500
+
+
 def test_start_position_only_tempo():
     board = chess.Board()
     assert evaluate(board) == TEMPO[0]  # everything else cancels out

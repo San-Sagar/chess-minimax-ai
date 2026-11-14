@@ -39,7 +39,7 @@ scripts/     benchmarking and strength-testing scripts
 | 1 | Rules (python-chess) ✅ |
 | 2 | Evaluation function ✅ |
 | 3 | Minimax → alpha-beta → iterative deepening → quiescence ✅ |
-| 4 | Search speed-ups (move ordering, transposition table, pruning) |
+| 4 | Search speed-ups (move ordering, transposition table, pruning) ✅ |
 | 5 | Search data recording |
 | 6 | Opening book + endgame tablebases |
 | 7 | Backend API |
@@ -68,6 +68,13 @@ py -3.11 -m venv .venv
 
 ```powershell
 .venv\Scripts\python scripts\compare_search.py --depth 3 --csv docs\search_comparison.csv
+```
+
+## Measure each search technique / play engine matches
+
+```powershell
+.venv\Scripts\python scripts\ablation.py --depth 4 --csv docs\ablation_depth4.csv
+.venv\Scripts\python scripts\match.py full phase3 --time 0.5 --pgn docs\match.pgn
 ```
 
 ## Inspect the evaluation

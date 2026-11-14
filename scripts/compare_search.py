@@ -18,7 +18,7 @@ import time
 import chess
 
 from chess_ai.engine.classic import alphabeta, minimax
-from chess_ai.engine.search import Searcher
+from chess_ai.engine.search import SearchConfig, Searcher
 
 POSITIONS = {
     "Start": chess.STARTING_FEN,
@@ -51,7 +51,8 @@ def main() -> None:
             mm, mm_t = timed(minimax, board, depth)
             ab, ab_t = timed(alphabeta, board, depth)
             eng, eng_t = timed(
-                lambda b, d: Searcher(quiescence=False).search(b, max_depth=d), board, depth
+                lambda b, d: Searcher(SearchConfig.textbook()).search(b, max_depth=d),
+                board, depth
             )
             eng_score = eng.score if board.turn == chess.WHITE else -eng.score
             agree = mm.score == ab.score == eng_score
