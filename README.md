@@ -40,7 +40,7 @@ scripts/     benchmarking and strength-testing scripts
 | 2 | Evaluation function ✅ |
 | 3 | Minimax → alpha-beta → iterative deepening → quiescence ✅ |
 | 4 | Search speed-ups (move ordering, transposition table, pruning) ✅ |
-| 5 | Search data recording |
+| 5 | Search data recording ✅ |
 | 6 | Opening book + endgame tablebases |
 | 7 | Backend API |
 | 8 | Board, move history, evaluation panel |
@@ -68,6 +68,12 @@ py -3.11 -m venv .venv
 
 ```powershell
 .venv\Scripts\python scripts\compare_search.py --depth 3 --csv docs\search_comparison.csv
+```
+
+## See what the AI records about a move
+
+```powershell
+.venv\Scripts\python scripts\analyze.py --moves e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 --time 3
 ```
 
 ## Measure each search technique / play engine matches

@@ -1,0 +1,1495 @@
+{
+ "analysis": {
+  "fen": "r1bqkb1r/ppp2ppp/2n2n2/3Pp1N1/2B5/8/PPPP1PPP/RNBQK2R b KQkq - 0 5",
+  "side": "black",
+  "best": {
+   "move": "f6d5",
+   "san": "Nxd5",
+   "score": 2,
+   "score_text": "+0.02",
+   "mate_in": null,
+   "depth": 7,
+   "line": [
+    "f6d5",
+    "b1c3",
+    "d8g5",
+    "c4d5",
+    "g5f6",
+    "e1g1",
+    "f8c5"
+   ],
+   "line_san": [
+    "Nxd5",
+    "Nc3",
+    "Qxg5",
+    "Bxd5",
+    "Qf6",
+    "O-O",
+    "Bc5"
+   ],
+   "refutation": "b1c3",
+   "refutation_san": "Nc3",
+   "eval_after": {
+    "phase": 22,
+    "total": -2,
+    "terms": {
+     "material": {
+      "label": "Material",
+      "white": 3609,
+      "black": 3609,
+      "net": 0
+     },
+     "piece_squares": {
+      "label": "Piece placement",
+      "white": 57,
+      "black": 77,
+      "net": -20
+     },
+     "pawn_structure": {
+      "label": "Pawn structure",
+      "white": 0,
+      "black": 0,
+      "net": 0
+     },
+     "passed_pawns": {
+      "label": "Passed pawns",
+      "white": 0,
+      "black": 0,
+      "net": 0
+     },
+     "mobility": {
+      "label": "Mobility",
+      "white": -61,
+      "black": -18,
+      "net": -43
+     },
+     "king_safety": {
+      "label": "King safety",
+      "white": -8,
+      "black": -60,
+      "net": 52
+     },
+     "bishop_pair": {
+      "label": "Bishop pair",
+      "white": 31,
+      "black": 31,
+      "net": 0
+     },
+     "rook_files": {
+      "label": "Rooks on open files",
+      "white": 0,
+      "black": 0,
+      "net": 0
+     },
+     "tempo": {
+      "label": "Side to move",
+      "white": 9,
+      "black": 0,
+      "net": 9
+     }
+    }
+   },
+   "term_changes": {
+    "material": 82,
+    "piece_squares": -30,
+    "pawn_structure": -10,
+    "passed_pawns": 0,
+    "mobility": 17,
+    "king_safety": -27,
+    "bishop_pair": 0,
+    "rook_files": 0,
+    "tempo": -19
+   },
+   "is_best": true
+  },
+  "candidates": [
+   {
+    "move": "f6d5",
+    "san": "Nxd5",
+    "score": 2,
+    "score_text": "+0.02",
+    "mate_in": null,
+    "depth": 7,
+    "line": [
+     "f6d5",
+     "b1c3",
+     "d8g5",
+     "c4d5",
+     "g5f6",
+     "e1g1",
+     "f8c5"
+    ],
+    "line_san": [
+     "Nxd5",
+     "Nc3",
+     "Qxg5",
+     "Bxd5",
+     "Qf6",
+     "O-O",
+     "Bc5"
+    ],
+    "refutation": "b1c3",
+    "refutation_san": "Nc3",
+    "eval_after": {
+     "phase": 22,
+     "total": -2,
+     "terms": {
+      "material": {
+       "label": "Material",
+       "white": 3609,
+       "black": 3609,
+       "net": 0
+      },
+      "piece_squares": {
+       "label": "Piece placement",
+       "white": 57,
+       "black": 77,
+       "net": -20
+      },
+      "pawn_structure": {
+       "label": "Pawn structure",
+       "white": 0,
+       "black": 0,
+       "net": 0
+      },
+      "passed_pawns": {
+       "label": "Passed pawns",
+       "white": 0,
+       "black": 0,
+       "net": 0
+      },
+      "mobility": {
+       "label": "Mobility",
+       "white": -61,
+       "black": -18,
+       "net": -43
+      },
+      "king_safety": {
+       "label": "King safety",
+       "white": -8,
+       "black": -60,
+       "net": 52
+      },
+      "bishop_pair": {
+       "label": "Bishop pair",
+       "white": 31,
+       "black": 31,
+       "net": 0
+      },
+      "rook_files": {
+       "label": "Rooks on open files",
+       "white": 0,
+       "black": 0,
+       "net": 0
+      },
+      "tempo": {
+       "label": "Side to move",
+       "white": 9,
+       "black": 0,
+       "net": 9
+      }
+     }
+    },
+    "term_changes": {
+     "material": 82,
+     "piece_squares": -30,
+     "pawn_structure": -10,
+     "passed_pawns": 0,
+     "mobility": 17,
+     "king_safety": -27,
+     "bishop_pair": 0,
+     "rook_files": 0,
+     "tempo": -19
+    },
+    "is_best": true
+   },
+   {
+    "move": "c6d4",
+    "san": "Nd4",
+    "score": -31,
+    "score_text": "-0.31",
+    "mate_in": null,
+    "depth": 4,
+    "line": [
+     "c6d4",
+     "d5d6",
+     "f8d6",
+     "g5f7"
+    ],
+    "line_san": [
+     "Nd4",
+     "d6",
+     "Bxd6",
+     "Nxf7"
+    ],
+    "refutation": "d5d6",
+    "refutation_san": "d6",
+    "eval_after": {
+     "phase": 24,
+     "total": 31,
+     "terms": {
+      "material": {
+       "label": "Material",
+       "white": 3957,
+       "black": 3875,
+       "net": 82
+      },
+      "piece_squares": {
+       "label": "Piece placement",
+       "white": -15,
+       "black": 85,
+       "net": -100
+      },
+      "pawn_structure": {
+       "label": "Pawn structure",
+       "white": 0,
+       "black": -15,
+       "net": 15
+      },
+      "passed_pawns": {
+       "label": "Passed pawns",
+       "white": 0,
+       "black": 0,
+       "net": 0
+      },
+      "mobility": {
+       "label": "Mobility",
+       "white": -61,
+       "black": -32,
+       "net": -29
+      },
+      "king_safety": {
+       "label": "King safety",
+       "white": -40,
+       "black": -113,
+       "net": 73
+      },
+      "bishop_pair": {
+       "label": "Bishop pair",
+       "white": 30,
+       "black": 30,
+       "net": 0
+      },
+      "rook_files": {
+       "label": "Rooks on open files",
+       "white": 0,
+       "black": 0,
+       "net": 0
+      },
+      "tempo": {
+       "label": "Side to move",
+       "white": 0,
+       "black": 10,
+       "net": -10
+      }
+     }
+    },
+    "term_changes": {
+     "material": 0,
+     "piece_squares": 50,
+     "pawn_structure": -25,
+     "passed_pawns": 0,
+     "mobility": 3,
+     "king_safety": -48,
+     "bishop_pair": 0,
+     "rook_files": 0,
+     "tempo": 0
+    },
+    "is_best": false
+   },
+   {
+    "move": "c8g4",
+    "san": "Bg4",
+    "score": -104,
+    "score_text": "-1.04",
+    "mate_in": null,
+    "depth": 6,
+    "line": [
+     "c8g4",
+     "g5f7",
+     "d8e7",
+     "c4e2",
+     "e8f7",
+     "d5c6"
+    ],
+    "line_san": [
+     "Bg4",
+     "Nxf7",
+     "Qe7",
+     "Be2",
+     "Kxf7",
+     "dxc6"
+    ],
+    "refutation": "g5f7",
+    "refutation_san": "Nxf7",
+    "eval_after": {
+     "phase": 22,
+     "total": 104,
+     "terms": {
+      "material": {
+       "label": "Material",
+       "white": 3692,
+       "black": 3526,
+       "net": 166
+      },
+      "piece_squares": {
+       "label": "Piece placement",
+       "white": -10,
+       "black": 60,
+       "net": -70
+      },
+      "pawn_structure": {
+       "label": "Pawn structure",
+       "white": -11,
+       "black": -16,
+       "net": 5
+      },
+      "passed_pawns": {
+       "label": "Passed pawns",
+       "white": 0,
+       "black": 0,
+       "net": 0
+      },
+      "mobility": {
+       "label": "Mobility",
+       "white": -73,
+       "black": -53,
+       "net": -20
+      },
+      "king_safety": {
+       "label": "King safety",
+       "white": -37,
+       "black": -69,
+       "net": 32
+      },
+      "bishop_pair": {
+       "label": "Bishop pair",
+       "white": 31,
+       "black": 31,
+       "net": 0
+      },
+      "rook_files": {
+       "label": "Rooks on open files",
+       "white": 0,
+       "black": 0,
+       "net": 0
+      },
+      "tempo": {
+       "label": "Side to move",
+       "white": 0,
+       "black": 9,
+       "net": -9
+      }
+     }
+    },
+    "term_changes": {
+     "material": -84,
+     "piece_squares": 20,
+     "pawn_structure": -15,
+     "passed_pawns": 0,
+     "mobility": -6,
+     "king_safety": -7,
+     "bishop_pair": 0,
+     "rook_files": 0,
+     "tempo": -1
+    },
+    "is_best": false
+   }
+  ],
+  "eval_before": {
+   "phase": 24,
+   "total": 11,
+   "terms": {
+    "material": {
+     "label": "Material",
+     "white": 4039,
+     "black": 3957,
+     "net": 82
+    },
+    "piece_squares": {
+     "label": "Piece placement",
+     "white": 15,
+     "black": 65,
+     "net": -50
+    },
+    "pawn_structure": {
+     "label": "Pawn structure",
+     "white": -10,
+     "black": 0,
+     "net": -10
+    },
+    "passed_pawns": {
+     "label": "Passed pawns",
+     "white": 0,
+     "black": 0,
+     "net": 0
+    },
+    "mobility": {
+     "label": "Mobility",
+     "white": -67,
+     "black": -41,
+     "net": -26
+    },
+    "king_safety": {
+     "label": "King safety",
+     "white": -40,
+     "black": -65,
+     "net": 25
+    },
+    "bishop_pair": {
+     "label": "Bishop pair",
+     "white": 30,
+     "black": 30,
+     "net": 0
+    },
+    "rook_files": {
+     "label": "Rooks on open files",
+     "white": 0,
+     "black": 0,
+     "net": 0
+    },
+    "tempo": {
+     "label": "Side to move",
+     "white": 0,
+     "black": 10,
+     "net": -10
+    }
+   }
+  },
+  "root_moves": [
+   {
+    "move": "f6d5",
+    "order": 0,
+    "score": 2,
+    "score_text": "+0.02",
+    "bound": "exact",
+    "nodes": 11158,
+    "refutation": null,
+    "reduced": false,
+    "researched": false
+   },
+   {
+    "move": "d8d5",
+    "order": 1,
+    "score": -263,
+    "score_text": "-2.63",
+    "bound": "upper",
+    "nodes": 59,
+    "refutation": "c4d5",
+    "reduced": false,
+    "researched": false
+   },
+   {
+    "move": "g7g6",
+    "order": 2,
+    "score": 1,
+    "score_text": "+0.01",
+    "bound": "upper",
+    "nodes": 775,
+    "refutation": "d5c6",
+    "reduced": false,
+    "researched": false
+   },
+   {
+    "move": "f8c5",
+    "order": 3,
+    "score": -2,
+    "score_text": "-0.02",
+    "bound": "upper",
+    "nodes": 1279,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c8g4",
+    "order": 4,
+    "score": 2,
+    "score_text": "+0.02",
+    "bound": "upper",
+    "nodes": 712,
+    "refutation": "g5f7",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "h8g8",
+    "order": 5,
+    "score": -339,
+    "score_text": "-3.39",
+    "bound": "upper",
+    "nodes": 279,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f8e7",
+    "order": 6,
+    "score": -309,
+    "score_text": "-3.09",
+    "bound": "upper",
+    "nodes": 1,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f8d6",
+    "order": 7,
+    "score": 0,
+    "score_text": "+0.00",
+    "bound": "upper",
+    "nodes": 170,
+    "refutation": null,
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f8b4",
+    "order": 8,
+    "score": -286,
+    "score_text": "-2.86",
+    "bound": "upper",
+    "nodes": 172,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f8a3",
+    "order": 9,
+    "score": 1,
+    "score_text": "+0.01",
+    "bound": "upper",
+    "nodes": 175,
+    "refutation": null,
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "e8e7",
+    "order": 10,
+    "score": -402,
+    "score_text": "-4.02",
+    "bound": "upper",
+    "nodes": 106,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "e8d7",
+    "order": 11,
+    "score": -31,
+    "score_text": "-0.31",
+    "bound": "upper",
+    "nodes": 76,
+    "refutation": null,
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "d8e7",
+    "order": 12,
+    "score": -368,
+    "score_text": "-3.68",
+    "bound": "upper",
+    "nodes": 81,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "d8d7",
+    "order": 13,
+    "score": -275,
+    "score_text": "-2.75",
+    "bound": "upper",
+    "nodes": 117,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "d8d6",
+    "order": 14,
+    "score": -275,
+    "score_text": "-2.75",
+    "bound": "upper",
+    "nodes": 88,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c8d7",
+    "order": 15,
+    "score": 0,
+    "score_text": "+0.00",
+    "bound": "upper",
+    "nodes": 127,
+    "refutation": null,
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c8e6",
+    "order": 16,
+    "score": -268,
+    "score_text": "-2.68",
+    "bound": "upper",
+    "nodes": 167,
+    "refutation": "d5e6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c8f5",
+    "order": 17,
+    "score": -168,
+    "score_text": "-1.68",
+    "bound": "upper",
+    "nodes": 188,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c8h3",
+    "order": 18,
+    "score": 2,
+    "score_text": "+0.02",
+    "bound": "upper",
+    "nodes": 222,
+    "refutation": null,
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "a8b8",
+    "order": 19,
+    "score": -331,
+    "score_text": "-3.31",
+    "bound": "upper",
+    "nodes": 133,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f6g8",
+    "order": 20,
+    "score": -93,
+    "score_text": "-0.93",
+    "bound": "upper",
+    "nodes": 127,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f6d7",
+    "order": 21,
+    "score": -23,
+    "score_text": "-0.23",
+    "bound": "upper",
+    "nodes": 72,
+    "refutation": null,
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f6h5",
+    "order": 22,
+    "score": -86,
+    "score_text": "-0.86",
+    "bound": "upper",
+    "nodes": 141,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f6g4",
+    "order": 23,
+    "score": -1,
+    "score_text": "-0.01",
+    "bound": "upper",
+    "nodes": 152,
+    "refutation": null,
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "f6e4",
+    "order": 24,
+    "score": -15,
+    "score_text": "-0.15",
+    "bound": "upper",
+    "nodes": 141,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c6b8",
+    "order": 25,
+    "score": -26,
+    "score_text": "-0.26",
+    "bound": "upper",
+    "nodes": 282,
+    "refutation": "g5f3",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c6e7",
+    "order": 26,
+    "score": 1,
+    "score_text": "+0.01",
+    "bound": "upper",
+    "nodes": 1611,
+    "refutation": "b1c3",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c6a5",
+    "order": 27,
+    "score": -1,
+    "score_text": "-0.01",
+    "bound": "upper",
+    "nodes": 733,
+    "refutation": "c4b5",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c6d4",
+    "order": 28,
+    "score": 2,
+    "score_text": "+0.02",
+    "bound": "upper",
+    "nodes": 551,
+    "refutation": "b1c3",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "c6b4",
+    "order": 29,
+    "score": -4,
+    "score_text": "-0.04",
+    "bound": "upper",
+    "nodes": 1663,
+    "refutation": "b1c3",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "h7h6",
+    "order": 30,
+    "score": -29,
+    "score_text": "-0.29",
+    "bound": "upper",
+    "nodes": 134,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "b7b6",
+    "order": 31,
+    "score": -372,
+    "score_text": "-3.72",
+    "bound": "upper",
+    "nodes": 125,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "a7a6",
+    "order": 32,
+    "score": -346,
+    "score_text": "-3.46",
+    "bound": "upper",
+    "nodes": 128,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "e5e4",
+    "order": 33,
+    "score": -2,
+    "score_text": "-0.02",
+    "bound": "upper",
+    "nodes": 139,
+    "refutation": null,
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "h7h5",
+    "order": 34,
+    "score": -352,
+    "score_text": "-3.52",
+    "bound": "upper",
+    "nodes": 130,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "b7b5",
+    "order": 35,
+    "score": -4,
+    "score_text": "-0.04",
+    "bound": "upper",
+    "nodes": 312,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   },
+   {
+    "move": "a7a5",
+    "order": 36,
+    "score": -353,
+    "score_text": "-3.53",
+    "bound": "upper",
+    "nodes": 130,
+    "refutation": "d5c6",
+    "reduced": true,
+    "researched": false
+   }
+  ],
+  "pruning": {
+   "depth": 7,
+   "branching_factor": 37.6,
+   "minimax_nodes": 109656513996,
+   "alphabeta_best_case": 2057300,
+   "searched_nodes": 14438,
+   "quiescence_nodes": 20192,
+   "saved_pct": 99.999987,
+   "one_in": 7594993
+  },
+  "search": {
+   "depth": 7,
+   "seldepth": 23,
+   "nodes": 34630,
+   "seconds": 2.196,
+   "nps": 15770,
+   "score": 2,
+   "score_text": "+0.02",
+   "mate_in": null,
+   "timed_out": false,
+   "stats": {
+    "nodes": 34630,
+    "qnodes": 20192,
+    "cutoffs": 6336,
+    "seldepth": 23,
+    "tt_hits": 945,
+    "tt_cutoffs": 239,
+    "null_cutoffs": 70,
+    "reductions": 2044,
+    "researches": 37,
+    "futility_prunes": 12314
+   },
+   "legal_moves": 37
+  },
+  "iterations": [
+   {
+    "depth": 1,
+    "score": 73,
+    "score_text": "+0.73",
+    "mate_in": null,
+    "pv": [
+     "f6d5"
+    ],
+    "nodes": 92,
+    "cutoffs": 6,
+    "seldepth": 7,
+    "seconds": 0.007,
+    "nps": 13441
+   },
+   {
+    "depth": 2,
+    "score": 25,
+    "score_text": "+0.25",
+    "mate_in": null,
+    "pv": [
+     "f6d5",
+     "b1c3"
+    ],
+    "nodes": 579,
+    "cutoffs": 137,
+    "seldepth": 8,
+    "seconds": 0.049,
+    "nps": 11815
+   },
+   {
+    "depth": 3,
+    "score": 24,
+    "score_text": "+0.24",
+    "mate_in": null,
+    "pv": [
+     "f6d5",
+     "b1c3",
+     "d8g5"
+    ],
+    "nodes": 1389,
+    "cutoffs": 332,
+    "seldepth": 9,
+    "seconds": 0.117,
+    "nps": 11911
+   },
+   {
+    "depth": 4,
+    "score": 24,
+    "score_text": "+0.24",
+    "mate_in": null,
+    "pv": [
+     "f6d5",
+     "b1c3",
+     "d8g5",
+     "c3d5"
+    ],
+    "nodes": 2202,
+    "cutoffs": 470,
+    "seldepth": 9,
+    "seconds": 0.168,
+    "nps": 13135
+   },
+   {
+    "depth": 5,
+    "score": 28,
+    "score_text": "+0.28",
+    "mate_in": null,
+    "pv": [
+     "f6d5",
+     "b1c3",
+     "d8g5",
+     "c3d5",
+     "f8d6"
+    ],
+    "nodes": 4004,
+    "cutoffs": 709,
+    "seldepth": 11,
+    "seconds": 0.274,
+    "nps": 14597
+   },
+   {
+    "depth": 6,
+    "score": 23,
+    "score_text": "+0.23",
+    "mate_in": null,
+    "pv": [
+     "f6d5",
+     "b1c3",
+     "d8g5",
+     "c3d5",
+     "g5g2",
+     "d5c7",
+     "e8d8"
+    ],
+    "nodes": 11973,
+    "cutoffs": 2220,
+    "seldepth": 23,
+    "seconds": 0.826,
+    "nps": 14486
+   },
+   {
+    "depth": 7,
+    "score": 2,
+    "score_text": "+0.02",
+    "mate_in": null,
+    "pv": [
+     "f6d5",
+     "b1c3",
+     "d8g5",
+     "c4d5",
+     "g5f6",
+     "e1g1",
+     "f8c5"
+    ],
+    "nodes": 34630,
+    "cutoffs": 6336,
+    "seldepth": 23,
+    "seconds": 2.196,
+    "nps": 15770
+   }
+  ]
+ },
+ "tree": {
+  "depth": 3,
+  "breadth": 3,
+  "alpha_beta": true,
+  "visited": 20,
+  "pruned": 20,
+  "total": 40,
+  "pruned_pct": 50.0,
+  "best_move": "f6d5",
+  "best_san": "Nxd5",
+  "value": 24,
+  "value_text": "+0.24",
+  "root": {
+   "id": 0,
+   "move": null,
+   "san": null,
+   "ply": 0,
+   "player": "max",
+   "status": "searched",
+   "alpha": "-inf",
+   "beta": "+inf",
+   "value": 24,
+   "value_text": "+0.24",
+   "is_leaf": false,
+   "caused_cutoff": false,
+   "best_child": 1,
+   "children": [
+    {
+     "id": 1,
+     "move": "f6d5",
+     "san": "Nxd5",
+     "ply": 1,
+     "player": "min",
+     "status": "searched",
+     "alpha": "-inf",
+     "beta": "+inf",
+     "value": 24,
+     "value_text": "+0.24",
+     "is_leaf": false,
+     "caused_cutoff": false,
+     "best_child": 2,
+     "children": [
+      {
+       "id": 2,
+       "move": "b1c3",
+       "san": "Nc3",
+       "ply": 2,
+       "player": "max",
+       "status": "searched",
+       "alpha": "-inf",
+       "beta": "+inf",
+       "value": 24,
+       "value_text": "+0.24",
+       "is_leaf": false,
+       "caused_cutoff": false,
+       "best_child": 3,
+       "children": [
+        {
+         "id": 3,
+         "move": "d8g5",
+         "san": "Qxg5",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": "-inf",
+         "beta": "+inf",
+         "value": 24,
+         "value_text": "+0.24",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 4,
+         "move": "d5c3",
+         "san": "Nxc3",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": 24,
+         "beta": "+inf",
+         "value": -125,
+         "value_text": "-1.25",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 5,
+         "move": "c8g4",
+         "san": "Bg4",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": 24,
+         "beta": "+inf",
+         "value": -367,
+         "value_text": "-3.67",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": 6,
+       "move": "c4d5",
+       "san": "Bxd5",
+       "ply": 2,
+       "player": "max",
+       "status": "searched",
+       "alpha": "-inf",
+       "beta": 24,
+       "value": 140,
+       "value_text": "+1.40",
+       "is_leaf": false,
+       "caused_cutoff": false,
+       "best_child": 7,
+       "children": [
+        {
+         "id": 7,
+         "move": "d8d5",
+         "san": "Qxd5",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": "-inf",
+         "beta": 24,
+         "value": 140,
+         "value_text": "+1.40",
+         "is_leaf": true,
+         "caused_cutoff": true,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 8,
+         "move": "d8g5",
+         "san": "Qxg5",
+         "ply": 3,
+         "player": "min",
+         "status": "pruned",
+         "alpha": null,
+         "beta": null,
+         "value": null,
+         "value_text": null,
+         "is_leaf": false,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 9,
+         "move": "c8g4",
+         "san": "Bg4",
+         "ply": 3,
+         "player": "min",
+         "status": "pruned",
+         "alpha": null,
+         "beta": null,
+         "value": null,
+         "value_text": null,
+         "is_leaf": false,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": 10,
+       "move": "g5h7",
+       "san": "Nxh7",
+       "ply": 2,
+       "player": "max",
+       "status": "searched",
+       "alpha": "-inf",
+       "beta": 24,
+       "value": 346,
+       "value_text": "+3.46",
+       "is_leaf": false,
+       "caused_cutoff": false,
+       "best_child": 11,
+       "children": [
+        {
+         "id": 11,
+         "move": "h8h7",
+         "san": "Rxh7",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": "-inf",
+         "beta": 24,
+         "value": 346,
+         "value_text": "+3.46",
+         "is_leaf": true,
+         "caused_cutoff": true,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 12,
+         "move": "c8f5",
+         "san": "Bf5",
+         "ply": 3,
+         "player": "min",
+         "status": "pruned",
+         "alpha": null,
+         "beta": null,
+         "value": null,
+         "value_text": null,
+         "is_leaf": false,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 13,
+         "move": "c8g4",
+         "san": "Bg4",
+         "ply": 3,
+         "player": "min",
+         "status": "pruned",
+         "alpha": null,
+         "beta": null,
+         "value": null,
+         "value_text": null,
+         "is_leaf": false,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "move": "d8d5",
+     "san": "Qxd5",
+     "ply": 1,
+     "player": "min",
+     "status": "searched",
+     "alpha": 24,
+     "beta": "+inf",
+     "value": -520,
+     "value_text": "-5.20",
+     "is_leaf": false,
+     "caused_cutoff": false,
+     "best_child": 15,
+     "children": [
+      {
+       "id": 15,
+       "move": "c4d5",
+       "san": "Bxd5",
+       "ply": 2,
+       "player": "max",
+       "status": "searched",
+       "alpha": 24,
+       "beta": "+inf",
+       "value": -520,
+       "value_text": "-5.20",
+       "is_leaf": false,
+       "caused_cutoff": true,
+       "best_child": 16,
+       "children": [
+        {
+         "id": 16,
+         "move": "f6d5",
+         "san": "Nxd5",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": 24,
+         "beta": "+inf",
+         "value": -520,
+         "value_text": "-5.20",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 17,
+         "move": "c8e6",
+         "san": "Be6",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": 24,
+         "beta": "+inf",
+         "value": -1027,
+         "value_text": "-10.27",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 18,
+         "move": "c8f5",
+         "san": "Bf5",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": 24,
+         "beta": "+inf",
+         "value": -1003,
+         "value_text": "-10.03",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": 19,
+       "move": "g5h7",
+       "san": "Nxh7",
+       "ply": 2,
+       "player": "max",
+       "status": "pruned",
+       "alpha": null,
+       "beta": null,
+       "value": null,
+       "value_text": null,
+       "is_leaf": false,
+       "caused_cutoff": false,
+       "best_child": null,
+       "children": []
+      },
+      {
+       "id": 20,
+       "move": "g5f7",
+       "san": "Nxf7",
+       "ply": 2,
+       "player": "max",
+       "status": "pruned",
+       "alpha": null,
+       "beta": null,
+       "value": null,
+       "value_text": null,
+       "is_leaf": false,
+       "caused_cutoff": false,
+       "best_child": null,
+       "children": []
+      }
+     ]
+    },
+    {
+     "id": 21,
+     "move": "c8f5",
+     "san": "Bf5",
+     "ply": 1,
+     "player": "min",
+     "status": "searched",
+     "alpha": 24,
+     "beta": "+inf",
+     "value": -442,
+     "value_text": "-4.42",
+     "is_leaf": false,
+     "caused_cutoff": false,
+     "best_child": 22,
+     "children": [
+      {
+       "id": 22,
+       "move": "d5c6",
+       "san": "dxc6",
+       "ply": 2,
+       "player": "max",
+       "status": "searched",
+       "alpha": 24,
+       "beta": "+inf",
+       "value": -442,
+       "value_text": "-4.42",
+       "is_leaf": false,
+       "caused_cutoff": true,
+       "best_child": 23,
+       "children": [
+        {
+         "id": 23,
+         "move": "b7c6",
+         "san": "bxc6",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": 24,
+         "beta": "+inf",
+         "value": -442,
+         "value_text": "-4.42",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 24,
+         "move": "f5c2",
+         "san": "Bxc2",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": 24,
+         "beta": "+inf",
+         "value": -847,
+         "value_text": "-8.47",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        },
+        {
+         "id": 25,
+         "move": "d8d2",
+         "san": "Qxd2+",
+         "ply": 3,
+         "player": "min",
+         "status": "searched",
+         "alpha": 24,
+         "beta": "+inf",
+         "value": -1291,
+         "value_text": "-12.91",
+         "is_leaf": true,
+         "caused_cutoff": false,
+         "best_child": null,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": 26,
+       "move": "g5h7",
+       "san": "Nxh7",
+       "ply": 2,
+       "player": "max",
+       "status": "pruned",
+       "alpha": null,
+       "beta": null,
+       "value": null,
+       "value_text": null,
+       "is_leaf": false,
+       "caused_cutoff": false,
+       "best_child": null,
+       "children": []
+      },
+      {
+       "id": 27,
+       "move": "g5f7",
+       "san": "Nxf7",
+       "ply": 2,
+       "player": "max",
+       "status": "pruned",
+       "alpha": null,
+       "beta": null,
+       "value": null,
+       "value_text": null,
+       "is_leaf": false,
+       "caused_cutoff": false,
+       "best_child": null,
+       "children": []
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -157,6 +157,34 @@ class IterationInfo:
         }
 
 
+@dataclass(frozen=True)
+class RootMoveStat:
+    """What happened to one root move in the last completed iteration.
+
+    With alpha-beta only the best move gets an exact score. The others are
+    *proven worse*: the search stops as soon as it finds an opponent reply
+    (the ``refutation``) showing the move is no better than the best so far.
+    """
+
+    move: chess.Move
+    order: int  # position in the move ordering (0 = searched first)
+    score: int  # side to move's point of view; a bound unless ``bound == "exact"``
+    bound: str  # "exact", "upper" (score is at most this) or "lower" (at least this)
+    nodes: int  # positions searched for this move
+    refutation: chess.Move | None  # opponent reply that cut the move off, if known
+    reduced: bool  # searched with a late-move reduction first
+    researched: bool  # needed a second search (PVS / LMR re-search)
+
+    def to_dict(self) -> dict:
+        return {
+            "move": self.move.uci(), "order": self.order, "score": self.score,
+            "score_text": format_score(self.score), "bound": self.bound,
+            "nodes": self.nodes,
+            "refutation": self.refutation.uci() if self.refutation else None,
+            "reduced": self.reduced, "researched": self.researched,
+        }
+
+
 @dataclass
 class SearchResult:
     best_move: chess.Move | None  # None only if there are no legal moves
@@ -167,6 +195,7 @@ class SearchResult:
     seconds: float
     iterations: list[IterationInfo] = field(default_factory=list)
     timed_out: bool = False  # True if the clock stopped a deeper iteration
+    root_moves: list[RootMoveStat] = field(default_factory=list)  # last completed depth
 
     @property
     def mate_in(self) -> int | None:
@@ -251,6 +280,8 @@ class Searcher:
         self._path: list = []  # position keys from the last irreversible move to here
         self._deadline: float | None = None
         self._root_best: chess.Move | None = None
+        self._root_moves: list[RootMoveStat] = []  # filled during each root search
+        self._refutation: chess.Move | None = None  # set by ply-1 cutoffs
 
     def new_game(self) -> None:
         self._tt.clear()
@@ -314,6 +345,7 @@ class Searcher:
                                  self.stats.seldepth, elapsed)
             result.iterations.append(info)
             result.best_move, result.score, result.pv, result.depth = pv[0], score, pv, depth
+            result.root_moves = list(self._root_moves)
             self._root_best = pv[0]
             if on_iteration:
                 on_iteration(info)
@@ -444,6 +476,8 @@ class Searcher:
                     if (e_flag == EXACT or (e_flag == LOWER and e_score >= beta)
                             or (e_flag == UPPER and e_score <= alpha)):
                         stats.tt_cutoffs += 1
+                        if ply == 1 and e_flag != UPPER:
+                            self._refutation = tt_move  # the stored reply refutes it
                         return e_score
 
         # --- pruning before searching any move (never on the main line or in check)
@@ -476,6 +510,9 @@ class Searcher:
         killers = self._killers[ply]
 
         best, best_move, original_alpha = -INFINITY, None, alpha
+        root = ply == 0
+        if root:
+            self._root_moves = []
         self._path.append(key)
         for i, move in enumerate(moves):
             quiet = not move.promotion and not board.is_capture(move)
@@ -483,11 +520,14 @@ class Searcher:
                 stats.futility_prunes += 1
                 continue
 
+            if root:  # record what alpha-beta does with each root move
+                nodes_before, alpha_before = stats.nodes, alpha
+                self._refutation = None
+            reduction, researched = 0, False
             board.push(move)
             if i == 0 or not cfg.pvs:
                 score = -self._negamax(board, depth - 1, -beta, -alpha, ply + 1, True)
             else:
-                reduction = 0
                 if (cfg.late_move_reductions and depth >= 3 and i >= 3 and quiet
                         and not in_check and move not in killers and not board.is_check()):
                     reduction = 1 if i < 6 else 2
@@ -496,11 +536,22 @@ class Searcher:
                                        ply + 1, True)
                 if score > alpha and reduction:  # reduced move surprised us: full depth
                     stats.researches += 1
+                    researched = True
                     score = -self._negamax(board, depth - 1, -alpha - 1, -alpha, ply + 1, True)
                 if alpha < score < beta:  # better than expected: get its exact score
                     stats.researches += 1
+                    researched = True
                     score = -self._negamax(board, depth - 1, -beta, -alpha, ply + 1, True)
             board.pop()
+            if root:
+                bound = ("upper" if score <= alpha_before else
+                         "lower" if score >= beta else "exact")
+                self._root_moves.append(RootMoveStat(
+                    move=move, order=i, score=score, bound=bound,
+                    nodes=stats.nodes - nodes_before,
+                    refutation=self._refutation if bound == "upper" else None,
+                    reduced=bool(reduction), researched=researched,
+                ))
 
             if score > best:
                 best, best_move = score, move
@@ -509,6 +560,8 @@ class Searcher:
                     self._pv[ply] = [move, *self._pv[ply + 1]]
                     if alpha >= beta:  # the opponent would never allow this line
                         stats.cutoffs += 1
+                        if ply == 1:
+                            self._refutation = move  # this reply refutes the root move
                         if quiet and cfg.move_ordering:
                             self._record_quiet_cutoff(board, move, depth, ply)
                         break
@@ -518,8 +571,10 @@ class Searcher:
             return static_eval if static_eval is not None else alpha
 
         if cfg.transposition_table:
-            flag = UPPER if best <= original_alpha else LOWER if best >= beta else EXACT
-            self._tt[key] = (depth, _to_tt(best, ply), flag, best_move)
+            old = self._tt.get(key)
+            if old is None or depth >= old[0]:  # keep the deeper (more reliable) result
+                flag = UPPER if best <= original_alpha else LOWER if best >= beta else EXACT
+                self._tt[key] = (depth, _to_tt(best, ply), flag, best_move)
         return best
 
     # ---------------------------------------------------------- quiescence
