@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chess-minimax-ai"
+version = "0.1.0"
+description = "Chess playing AI using the minimax algorithm with alpha-beta pruning"
+readme = "README.md"
+requires-python = ">=3.10"   # 3.10+ keeps the code runnable on PyPy for extra speed
+dependencies = [
+    "chess==1.11.2",              # python-chess: board, legal moves, FEN/PGN, books, tablebases
+    "fastapi==0.115.6",           # backend API + WebSocket for live search updates
+    "uvicorn[standard]==0.34.0",  # ASGI server that runs the backend
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "httpx==0.28.1",   # used by FastAPI's test client
+    "ruff==0.8.4",     # linter / formatter
+]
+
+[tool.setuptools.packages.find]
+include = ["chess_ai*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
