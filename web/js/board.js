@@ -49,16 +49,27 @@ export class ChessBoard {
     this.el.append(this.squaresLayer);
     this._buildSquares();
 
-    new ResizeObserver(() => this._resize()).observe(this.el);
+    this.resizer = new ResizeObserver(() => this._resize());
+    this.resizer.observe(this.el);
     this._resize();
-    this.el.addEventListener("pointerdown", (e) => this._pointerDown(e));
-    this.el.addEventListener("pointermove", (e) => this._pointerMove(e));
-    this.el.addEventListener("pointerup", (e) => this._pointerUp(e));
-    this.el.addEventListener("pointercancel", () => this._cancelDrag());
-    this.el.addEventListener("contextmenu", (e) => e.preventDefault());
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") { this._closePromo(); this._select(null); }
-    });
+    this.listeners = [
+      [this.el, "pointerdown", (e) => this._pointerDown(e)],
+      [this.el, "pointermove", (e) => this._pointerMove(e)],
+      [this.el, "pointerup", (e) => this._pointerUp(e)],
+      [this.el, "pointercancel", () => this._cancelDrag()],
+      [this.el, "contextmenu", (e) => e.preventDefault()],
+      [document, "keydown", (e) => {
+        if (e.key === "Escape") { this._closePromo(); this._select(null); }
+      }],
+    ];
+    for (const [target, type, fn] of this.listeners) target.addEventListener(type, fn);
+  }
+
+  /** Remove everything this board added (used when switching to another board view). */
+  destroy() {
+    this.resizer.disconnect();
+    for (const [target, type, fn] of this.listeners) target.removeEventListener(type, fn);
+    this.el.replaceChildren();
   }
 
   // ------------------------------------------------------------ geometry

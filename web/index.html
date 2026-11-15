@@ -16,6 +16,11 @@
         <p class="tagline">Minimax with alpha-beta pruning, built from scratch</p>
       </div>
     </div>
+    <div class="modebar" role="group" aria-label="Board style">
+      <button class="mode-btn" data-mode="plain" aria-pressed="true" title="Flat board">▦ Plain</button>
+      <button class="mode-btn" data-mode="3d" aria-pressed="false" title="3D wooden board">◆ 3D</button>
+      <button class="mode-btn" data-mode="battle" aria-pressed="false" title="Animated battle armies">⚔ Battle</button>
+    </div>
     <nav class="topnav">
       <a class="btn" href="learn.html" title="How minimax and alpha-beta work">📖 Learn</a>
       <button id="btn-new" class="btn primary">New game</button>
@@ -197,6 +202,8 @@
 
   <div class="toast" id="toast" role="alert" hidden></div>
 
+  <!-- Three.js (MIT licence, kept in web/vendor) is only loaded when 3D or Battle is chosen -->
+  <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js" } }</script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

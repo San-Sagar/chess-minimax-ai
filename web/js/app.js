@@ -1,6 +1,6 @@
 // Main page logic: talks to the server, keeps the board and panels in sync.
 
-import { ChessBoard } from "./board.js";
+import { BoardHost, savedMode, webglAvailable } from "./boardhost.js";
 import * as panels from "./panels.js";
 import * as sound from "./sound.js";
 import { renderThinking } from "./thinking.js";
@@ -32,7 +32,31 @@ const app = {
   thinkingPly: null, // AI ply currently shown in the AI Thinking panel
 };
 
-const board = new ChessBoard($("board"), { onMove: humanMove });
+const board = new BoardHost($("board"), { onMove: humanMove, onModeChange: showMode });
+
+// ---------------------------------------------------------------- board style (Plain / 3D / Battle)
+
+function showMode(mode) {
+  for (const b of document.querySelectorAll(".mode-btn")) {
+    b.setAttribute("aria-pressed", String(b.dataset.mode === mode));
+  }
+}
+
+async function chooseMode(mode) {
+  if (mode !== "plain" && !webglAvailable()) {
+    toast("This browser can't show 3D graphics, so the plain board is used.");
+    mode = "plain";
+  }
+  showMode(mode);
+  const used = await board.setMode(mode);
+  if (used !== mode) toast("The 3D board couldn't start here, so the plain board is used.");
+  else if (mode === "battle") toast("Battle armies are coming soon. For now Battle shows the 3D board.");
+}
+
+for (const b of document.querySelectorAll(".mode-btn")) {
+  b.addEventListener("click", () => chooseMode(b.dataset.mode));
+}
+if (savedMode() !== "plain") chooseMode(savedMode());
 
 // ---------------------------------------------------------------- server calls
 

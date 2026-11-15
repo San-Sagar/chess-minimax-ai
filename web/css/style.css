@@ -116,6 +116,28 @@ h2:first-child { margin-top: 0; }
   .tagline { display: none; }
 }
 
+/* ------------------------------------------------------------------ board style switch */
+
+.modebar { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--border);
+           border-radius: 10px; background: var(--surface-2); flex: none; }
+.mode-btn { font: inherit; font-size: 13.5px; color: var(--muted); background: transparent;
+            border: 0; border-radius: 7px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+.mode-btn:hover { color: var(--text); }
+.mode-btn[aria-pressed="true"] { background: var(--surface); color: var(--text); font-weight: 600;
+                                 box-shadow: inset 0 0 0 1px var(--accent); }
+.mode-btn:focus-visible { outline: 2px solid var(--accent); }
+@media (max-width: 760px) {
+  .topbar { flex-wrap: wrap; }
+  .modebar { order: 3; width: 100%; }
+  .mode-btn { flex: 1; }
+}
+
+.board.board-3d { background: radial-gradient(ellipse at 50% 40%, #3b4250, #15181d 75%); }
+.board3d-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.promo.promo-3d { left: 50%; top: 50%; transform: translate(-50%, -50%); width: auto;
+                  flex-direction: row; }
+.promo.promo-3d button { width: 64px; height: 64px; font-size: 44px; }
+
 /* ------------------------------------------------------------------ players & clocks */
 
 .player-row { display: flex; justify-content: space-between; align-items: center;
