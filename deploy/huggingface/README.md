@@ -16,7 +16,7 @@ Alpha-Beta pruning**, and see *why* it chose each move (AI Thinking panel, searc
 viewer, and an interactive Learn page).
 
 Everything (chess rules, search, evaluation, interface) is written from scratch in
-Python and JavaScript. Source code: https://github.com/GITHUB_USER/chess-minimax-ai
+Python and JavaScript. Source code: https://github.com/xyzhentai69-droid/chess-minimax-ai
 
 This Space builds the app directly from the GitHub repository (see `Dockerfile`).
 To deploy a new version: push to GitHub, then **Settings → Factory rebuild** here.

@@ -64,6 +64,26 @@ py -3.11 -m venv .venv
 .venv\Scripts\python -m pytest
 ```
 
+## Deploy (Hugging Face Spaces)
+
+The app runs online as a Docker Space that builds straight from this repository:
+
+1. Create a Space: **SDK = Docker, template = Blank, visibility = Public**.
+2. Add the two files from [`deploy/huggingface/`](deploy/huggingface/) (`README.md`, `Dockerfile`).
+3. The Space builds and starts on port 7860. To publish a new version later: push to
+   GitHub, then **Settings → Factory rebuild** on the Space.
+
+Server settings (environment variables): `CHESS_MAX_AI_SECONDS` (cap on AI thinking time,
+default 5 in Docker), `CHESS_MAX_SEARCHES` (AI searches allowed at once, default 2),
+`CHESS_QUEUE_TIMEOUT` (seconds a move may wait for a free slot, default 60).
+
+Run the same production image locally:
+
+```powershell
+docker build -t chess-minimax-ai .
+docker run -p 7860:7860 chess-minimax-ai      # http://localhost:7860
+```
+
 ## Run the server
 
 ```powershell

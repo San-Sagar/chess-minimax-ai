@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git \
     && rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --uid 1000 user
 
-ARG REPO=https://github.com/GITHUB_USER/chess-minimax-ai.git
+ARG REPO=https://github.com/xyzhentai69-droid/chess-minimax-ai.git
 WORKDIR /home/user
 RUN git clone --depth 1 "$REPO" app
 WORKDIR /home/user/app
