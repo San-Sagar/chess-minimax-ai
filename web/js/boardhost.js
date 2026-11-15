@@ -106,10 +106,16 @@ export class BoardHost {
     return mode;
   }
 
+  /** Opening animation of the 3D views (the plain board has none). */
+  playIntro(options) {
+    this.view.playIntro?.(options);
+  }
+
   _replay() {
     const s = this.last;
     this.view.setOrientation(s.orientation);
-    if (s.fen) this.view.setPosition(s.fen, { lastMove: s.lastMove, check: s.check, intro: true });
+    if (s.fen) this.view.setPosition(s.fen, { lastMove: s.lastMove, check: s.check });
     this.view.setInteractive(s.color, s.legal);
+    this.view.playIntro?.({ drop: false });
   }
 }

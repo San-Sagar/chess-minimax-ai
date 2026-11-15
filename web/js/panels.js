@@ -65,7 +65,12 @@ export function renderHistory(state, viewPly, onPick) {
     return tr;
   }));
   const current = body.querySelector(".mv.current");
-  if (current) current.scrollIntoView({ block: "nearest" });
+  if (current) { // scroll only the move list, never the page (the board must stay in view)
+    const box = el("history-scroll");
+    const r = current.getBoundingClientRect(), b = box.getBoundingClientRect();
+    if (r.bottom > b.bottom) box.scrollTop += r.bottom - b.bottom + 4;
+    else if (r.top < b.top + 30) box.scrollTop -= b.top + 30 - r.top; // 30px: sticky header
+  }
 }
 
 function moveButton(rec, state, viewPly, onPick) {

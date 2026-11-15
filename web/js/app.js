@@ -42,7 +42,7 @@ function showMode(mode) {
   }
 }
 
-async function chooseMode(mode) {
+async function chooseMode(mode, clicked = false) {
   if (mode !== "plain" && !webglAvailable()) {
     toast("This browser can't show 3D graphics, so the plain board is used.");
     mode = "plain";
@@ -50,11 +50,11 @@ async function chooseMode(mode) {
   showMode(mode);
   const used = await board.setMode(mode);
   if (used !== mode) toast("The 3D board couldn't start here, so the plain board is used.");
-  else if (mode === "battle") toast("Battle armies are coming soon. For now Battle shows the 3D board.");
+  else if (mode === "battle" && clicked) toast("Battle armies are coming soon. For now Battle shows the 3D board.");
 }
 
 for (const b of document.querySelectorAll(".mode-btn")) {
-  b.addEventListener("click", () => chooseMode(b.dataset.mode));
+  b.addEventListener("click", () => chooseMode(b.dataset.mode, true));
 }
 if (savedMode() !== "plain") chooseMode(savedMode());
 
@@ -106,6 +106,7 @@ async function startGame(options) {
   setState(await api("/api/games", { method: "POST", body: options }));
   app.flipped = false;
   render();
+  board.playIntro({ drop: true }); // 3D views: 360° spin while the pieces drop in
   if (app.state.ai_to_move) requestAiMove();
 }
 
