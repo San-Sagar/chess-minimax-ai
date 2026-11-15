@@ -45,7 +45,7 @@ from chess_ai import __version__, chess
 from chess_ai.engine.evaluation import evaluate_breakdown
 from chess_ai.game import BLACK, WHITE, IllegalMoveError
 from chess_ai.server.sessions import (
-    DEFAULT_LEVEL, LEVELS, Clock, GameSession, SessionError, SessionStore,
+    DEFAULT_LEVEL, LEVELS, LIMITS, Clock, GameSession, SessionError, SessionStore,
 )
 
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
@@ -105,14 +105,24 @@ def _run(fn, *args, **kwargs):
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"status": "ok", "version": __version__, "games": len(store)}
+    return {"status": "ok", "version": __version__, "games": len(store),
+            "max_searches": LIMITS.max_searches, "max_ai_seconds": LIMITS.max_ai_seconds}
 
 
 @app.get("/api/info")
 def info() -> dict:
+    levels = []
+    for lv in LEVELS.values():
+        d = lv.to_dict()
+        capped = LIMITS.cap(lv.time_limit)
+        if capped < lv.time_limit:  # tell players the real time on this server
+            d["time_limit"] = capped
+            if lv.max_depth is None:
+                d["description"] = f"Full engine, {capped:g} seconds per move on this server."
+        levels.append(d)
     return {
         "version": __version__,
-        "levels": [lv.to_dict() for lv in LEVELS.values()],
+        "levels": levels,
         "default_level": DEFAULT_LEVEL,
         "rules_engine": "chess_ai.chess (written from scratch)",
         "search": "negamax minimax with alpha-beta pruning, iterative deepening, "

@@ -253,6 +253,42 @@ def test_websocket_streams_thinking():
         assert ws.receive_json()["type"] == "error"
 
 
+@pytest.fixture
+def limits():
+    """Change the server limits for one test, then restore the defaults."""
+    from chess_ai.server.sessions import LIMITS
+    saved = (LIMITS.max_ai_seconds, LIMITS.max_searches, LIMITS.queue_timeout)
+    yield LIMITS
+    LIMITS.configure(*saved)
+
+
+def test_busy_server_queues_then_refuses(limits):
+    limits.configure(max_ai_seconds=None, max_searches=1, queue_timeout=0.2)
+    s = GameSession(human_color=BLACK, level="beginner", seed=1)
+    limits.acquire()  # another game is using the only search slot
+    try:
+        with pytest.raises(SessionError, match="busy"):
+            s.ai_move()
+        assert not s.thinking
+    finally:
+        limits.release()
+    assert s.ai_move()["ply"] == 1  # slot free again: the AI moves normally
+
+
+def test_ai_time_cap(limits):
+    limits.configure(max_ai_seconds=0.5, max_searches=2, queue_timeout=5)
+    assert limits.cap(8.0) == 0.5 and limits.cap(0.3) == 0.3
+    info = client.get("/api/info").json()
+    master = next(lv for lv in info["levels"] if lv["name"] == "master")
+    assert master["time_limit"] == 0.5 and "0.5 seconds" in master["description"]
+    s = GameSession(human_color=WHITE, level="master", seed=2,
+                    fen="r2q1rk1/pp2bppp/2n1pn2/3p4/3P4/2NBPN2/PP3PPP/R2Q1RK1 b - - 0 10")
+    s.engine.book = None
+    report = s.ai_move()
+    assert report["analysis"]["search"]["seconds"] < 1.5  # capped, not 8 s
+    assert client.get("/api/health").json()["max_ai_seconds"] == 0.5
+
+
 def test_web_pages_served_without_stale_cache():
     for path in ("/", "/learn.html", "/js/learn.js", "/js/board.js"):
         r = client.get(path)

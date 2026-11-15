@@ -10,6 +10,7 @@ This module has no web code, so it can be tested directly.
 
 from __future__ import annotations
 
+import os
 import random
 import threading
 import time
@@ -29,6 +30,47 @@ from chess_ai.game import BLACK, WHITE, Game, IllegalMoveError
 
 class SessionError(Exception):
     """A request that is valid but not allowed right now (e.g. not your turn)."""
+
+
+# ----------------------------------------------------------------------- server limits
+# A shared server (e.g. a class of students) must not be swamped by AI searches.
+# Python runs one search at a time per process, so only a few may share the CPU at
+# once; the others wait their turn. All three settings come from environment variables.
+
+
+def _env_float(name: str, default: float | None) -> float | None:
+    value = os.environ.get(name, "").strip()
+    return float(value) if value else default
+
+
+class ServerLimits:
+    def __init__(self) -> None:
+        self.configure(
+            max_ai_seconds=_env_float("CHESS_MAX_AI_SECONDS", None),
+            max_searches=int(_env_float("CHESS_MAX_SEARCHES", 2)),
+            queue_timeout=_env_float("CHESS_QUEUE_TIMEOUT", 60.0),
+        )
+
+    def configure(self, max_ai_seconds: float | None, max_searches: int,
+                  queue_timeout: float) -> None:
+        self.max_ai_seconds = max_ai_seconds  # None = each level's own time
+        self.max_searches = max(1, max_searches)
+        self.queue_timeout = queue_timeout
+        self.slots = threading.BoundedSemaphore(self.max_searches)
+
+    def cap(self, seconds: float) -> float:
+        return seconds if self.max_ai_seconds is None else min(seconds, self.max_ai_seconds)
+
+    def acquire(self) -> None:
+        if not self.slots.acquire(timeout=self.queue_timeout):
+            raise SessionError("The server is busy with other players' games. "
+                               "Please try again in a moment.")
+
+    def release(self) -> None:
+        self.slots.release()
+
+
+LIMITS = ServerLimits()
 
 
 # ----------------------------------------------------------------------- clock
@@ -201,14 +243,20 @@ class GameSession:
                 raise SessionError("it is not the AI's turn")
             self.thinking = True
         try:
+            LIMITS.acquire()  # wait for a free search slot (SessionError if too busy)
+        except SessionError:
+            self.thinking = False
+            raise
+        try:
             return self._think_and_move(on_iteration)
         finally:
+            LIMITS.release()
             self.thinking = False
 
     def _think_and_move(self, on_iteration) -> dict:
         board = self.game.board
         level = self.level
-        time_limit = level.time_limit
+        time_limit = LIMITS.cap(level.time_limit)
         if self.clock is not None:
             if self.clock.started_at is None:
                 self.clock.start(self.ai)
@@ -291,7 +339,11 @@ class GameSession:
             if self.thinking:
                 raise SessionError("the AI is thinking")
             board = self.game.board
-            r = Searcher().search(board, time_limit=think_time)
+            LIMITS.acquire()
+            try:
+                r = Searcher().search(board, time_limit=think_time)
+            finally:
+                LIMITS.release()
             ai_is_white = self.ai == WHITE
             # r.score is from the side to move's view; convert it to the AI's view
             ai_score = r.score if board.turn == ai_is_white else -r.score
