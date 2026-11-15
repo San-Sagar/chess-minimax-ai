@@ -15,6 +15,7 @@ export function scoreText(cp) {
   if (cp === null || cp === undefined) return "–";
   if (Math.abs(cp) >= MATE - 200) {
     const plies = MATE - Math.abs(cp);
+    if (plies === 0) return "#"; // the game has ended in checkmate
     const n = Math.ceil(plies / 2);
     return cp > 0 ? `#${n}` : `#-${n}`;
   }

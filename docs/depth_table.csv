@@ -1,0 +1,5 @@
+position,depth,minimax_nodes,minimax_s,alphabeta_nodes,alphabeta_s,reduction_pct,engine_nodes,engine_s,same_score,score_cp
+start,2,421,0.102,84,0.018,80.05,146,0.022,True,10
+start,3,9323,1.242,780,0.11,91.63,387,0.038,True,54
+start,4,206604,19.427,3372,0.538,98.37,910,0.116,True,10
+start,5,5071893,439.151,45037,4.975,99.11,2951,0.308,True,96
