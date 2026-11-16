@@ -204,6 +204,28 @@ function finishAiMove(report, state) {
   render();
 }
 
+/** The AI is already thinking (started before a reload): wait for its move, don't ask again. */
+async function waitForAi() {
+  app.thinking = true;
+  panels.setThinking(true);
+  render();
+  for (let i = 0; i < 180; i++) {
+    await new Promise((r) => setTimeout(r, 1000));
+    let s;
+    try { s = await api(`/api/games/${app.state.id}`); } catch { continue; }
+    if (s.thinking) continue;
+    app.thinking = false;
+    panels.setThinking(false);
+    setState(s);
+    render();
+    if (s.ai_to_move) requestAiMove();
+    return;
+  }
+  app.thinking = false;
+  panels.setThinking(false);
+  render();
+}
+
 async function refresh() {
   if (!app.state) return;
   try {
@@ -568,7 +590,8 @@ showSound();
       setState(await api(`/api/games/${saved}`));
       app.wasOver = app.state.game.status.is_over;
       render();
-      if (app.state.ai_to_move) requestAiMove();
+      if (app.state.thinking) waitForAi(); // page reloaded while the AI was thinking
+      else if (app.state.ai_to_move) requestAiMove();
       return;
     } catch { /* the server forgot that game: start a new one */ }
   }

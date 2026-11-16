@@ -275,6 +275,30 @@ def test_busy_server_queues_then_refuses(limits):
     assert s.ai_move()["ply"] == 1  # slot free again: the AI moves normally
 
 
+def test_second_ai_move_request_is_refused_while_thinking(limits):
+    # reloading the page while the AI thinks used to start a second search on the same
+    # board; the first move then made the second one illegal
+    import threading
+    import time
+    limits.configure(max_ai_seconds=None, max_searches=2, queue_timeout=5)
+    s = GameSession(human_color=WHITE, level="hard", seed=3,
+                    fen="r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R b KQkq - 0 5")
+    s.engine.book = None
+    first = {}
+    t = threading.Thread(target=lambda: first.update(report=s.ai_move()))
+    t.start()
+    for _ in range(200):
+        if s.thinking:
+            break
+        time.sleep(0.01)
+    assert s.thinking
+    with pytest.raises(SessionError, match="already thinking"):
+        s.ai_move()
+    t.join()
+    assert first["report"]["ply"] == 1 and len(s.game.history) == 1
+    assert not s.thinking and s.game.turn == WHITE
+
+
 def test_ai_time_cap(limits):
     limits.configure(max_ai_seconds=0.5, max_searches=2, queue_timeout=5)
     assert limits.cap(8.0) == 0.5 and limits.cap(0.3) == 0.3

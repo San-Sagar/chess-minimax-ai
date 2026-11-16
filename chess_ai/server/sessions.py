@@ -241,6 +241,8 @@ class GameSession:
                 raise SessionError("the game is over")
             if self.game.turn != self.ai:
                 raise SessionError("it is not the AI's turn")
+            if self.thinking:  # e.g. the page was reloaded while the AI was thinking
+                raise SessionError("the AI is already thinking about this move")
             self.thinking = True
         try:
             LIMITS.acquire()  # wait for a free search slot (SessionError if too busy)
