@@ -619,7 +619,11 @@ export class BattleBoard extends Board3D {
   }
 
   _createPiece(type, color) {
-    return buildUnit(type, color);
+    const unit = buildUnit(type, color);
+    // phones: the soldiers' many small parts don't cast shadows (halves the drawing work);
+    // their round bases still sit them on the ground
+    if (this.quality === "low") unit.traverse((o) => { if (o.isMesh) o.castShadow = false; });
+    return unit;
   }
 
   // ------------------------------------------------------------ scenery
@@ -629,7 +633,7 @@ export class BattleBoard extends Board3D {
     const sun = new THREE.DirectionalLight("#ffd3a0", 3.0); // low evening sun
     sun.position.set(7, 8, 3);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.mapSize.set(this.shadowSize, this.shadowSize);
     Object.assign(sun.shadow.camera, { left: -7, right: 7, top: 7, bottom: -7, near: 2, far: 30 });
     sun.shadow.bias = -0.0004;
     sun.shadow.normalBias = 0.02;

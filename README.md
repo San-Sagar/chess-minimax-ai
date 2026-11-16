@@ -8,11 +8,20 @@ can see *why* the AI chose each move.
 board, legal move generation, FEN/SAN/PGN), the evaluation function, minimax, alpha-beta
 and all search techniques, and the opening book. No chess library or downloaded chess
 data is used. The move generator is verified with perft against the published counts.
+(The optional 3D views use the Three.js graphics library for drawing only.)
 
-## Features (planned)
+## Features
 
 - **Human vs AI:** pick a colour, difficulty and clock; undo, resign, flip board
-- **Animated board:** drag-and-drop, legal-move dots, last-move and check highlights
+- **Three board styles** (buttons at the top, the choice is remembered):
+  - **Plain:** flat animated board: drag-and-drop, legal-move dots, last-move and check highlights
+  - **3D:** carved wooden pieces on a wooden board (shapes and wood grain generated in code),
+    drag or click to move, rotate / zoom the camera, a 360° fly-around before each game
+  - **Battle:** the pieces are soldiers on a battlefield and every capture is a fight:
+    spearman (pawn) stabs, horse archer (knight) shoots, javelin priest (bishop) throws,
+    war elephant (rook) shoots from its tower and charges, sorceress (queen) calls lightning,
+    warlord-mage (king) releases a shockwave. Armies march in, a mated king kneels.
+    Speed control: 1× / 2× / Skip. Battle sounds are synthesised with the Web Audio API.
 - **Move history:** numbered move list, click to replay, captured pieces, PGN export
 - **Evaluation panel:** eval bar, score graph, depth, nodes, nodes/sec, best line, top moves
 - **AI Thinking panel:** a plain-language explanation of every AI move: its ideas,
@@ -54,7 +63,12 @@ scripts/     benchmarking and strength-testing scripts
 | 9 | AI Thinking panel + search tree viewer ✅ |
 | 10 | Learn page: animated minimax / alpha-beta lessons ✅ |
 | 11 | Strength testing: tactics suite, level ladder, report (`docs/strength_report.md`) ✅ |
-| 12 | Project report |
+| 12 | Project report ✅ |
+| 13 | Board style switch (Plain / 3D / Battle) ✅ |
+| 14 | 3D board: carved pieces, wood textures, 360° intro ✅ |
+| 15 | Battle mode: armies and battlefield ✅ |
+| 16 | Battle mode: attack animations, march-in, sounds, speed control ✅ |
+| 17 | Phone performance, release ✅ |
 
 ## Setup
 
@@ -93,7 +107,17 @@ docker run -p 7860:7860 chess-minimax-ai      # http://localhost:7860
 Open http://127.0.0.1:8000 to play. The page (`web/`) is plain HTML, CSS and JavaScript
 modules written for this project: `board.js` (board, animation, drag and drop, promotion),
 `panels.js` (move history, eval bar, score graph, live search), `app.js` (game flow),
-`sound.js` (move sounds made with the Web Audio API).
+`sound.js` (move and battle sounds made with the Web Audio API).
+
+The 3D views: `boardhost.js` (switches between Plain / 3D / Battle behind one interface),
+`board3d.js` (3D board, camera, input, intro), `pieces3d.js` (lathe-turned pieces),
+`textures3d.js` (wood, stone and sky painted in code), `units3d.js` (the battle units and
+their jointed rigs), `battle3d.js` (battlefield, attack choreography, move queue).
+They use [Three.js](https://threejs.org) r170 (MIT licence), kept in `web/vendor/three/`
+and loaded only when 3D or Battle is chosen. Three.js only draws the graphics: the chess
+rules, the AI and every model and texture are this project's own code. On phones the 3D
+views use lighter settings, and they lower their quality by themselves on a slow device.
+Without WebGL the page falls back to the Plain board.
 
 API docs (interactive) at http://127.0.0.1:8000/docs. Main endpoints: `POST /api/games`,
 `POST /api/games/{id}/move`, `POST /api/games/{id}/ai-move`, `GET /api/games/{id}/tree`,

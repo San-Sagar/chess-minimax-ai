@@ -26,6 +26,16 @@ const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 const easeOut = (t) => 1 - (1 - t) ** 3;
 const clamp01 = (t) => Math.min(1, Math.max(0, t));
 
+/**
+ * "low" on phones and tablets (touch screen or small screen): sharper-than-needed
+ * pixels and soft shadows cost a lot there. Everything still works, just lighter.
+ */
+export function detectQuality() {
+  const touch = window.matchMedia?.("(pointer: coarse)").matches;
+  const small = Math.min(window.screen?.width || 9999, window.screen?.height || 9999) < 700;
+  return touch || small ? "low" : "high";
+}
+
 export class Board3D {
   constructor(el, { onMove, mode = "3d" }) {
     this.el = el;
@@ -45,11 +55,15 @@ export class Board3D {
     this.intro = null;
     this.traySignature = "";
     this.trayY = -0.6; // height of the table the captured pieces stand on
+    this.quality = detectQuality();
+    this.shadowSize = this.quality === "low" ? 1024 : 2048;
+    this.visible = true;
+    this.frameTimes = [];
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.quality === "low" ? 1.5 : 2));
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = this.quality === "low" ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.domElement.className = "board3d-canvas";
@@ -94,6 +108,9 @@ export class Board3D {
     this.resizer = new ResizeObserver(() => this._resize());
     this.resizer.observe(el);
     this._resize();
+    // don't draw while the board is scrolled out of view (saves battery on phones)
+    this.seen = new IntersectionObserver(([entry]) => { this.visible = entry.isIntersecting; });
+    this.seen.observe(el);
     this.running = true;
     const loop = (now) => {
       if (!this.running) return;
@@ -107,6 +124,7 @@ export class Board3D {
     this.running = false;
     cancelAnimationFrame(this.frame);
     this.resizer.disconnect();
+    this.seen.disconnect();
     for (const [t, type, fn, cap] of this.listeners) t.removeEventListener(type, fn, cap);
     this.controls.dispose();
     this.envMap.dispose();
@@ -122,7 +140,7 @@ export class Board3D {
     const key = new THREE.DirectionalLight("#fff1dc", 2.6);
     key.position.set(5, 11, 6);
     key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.mapSize.set(this.shadowSize, this.shadowSize);
     Object.assign(key.shadow.camera, { left: -7, right: 7, top: 7, bottom: -7, near: 2, far: 30 });
     key.shadow.bias = -0.0004;
     key.shadow.normalBias = 0.02;
@@ -273,6 +291,8 @@ export class Board3D {
       if (t >= 1) { tw.done?.(); return false; }
       return true;
     });
+    if (!this.visible && !this.intro) return; // off screen: keep animations moving, skip drawing
+    this._watchSpeed(now);
     this._animateIdle(now);
     if (this.intro) this._introFrame(now);
     else this.controls.update();
@@ -282,6 +302,27 @@ export class Board3D {
       tile.material.color.copy(tile.userData.base).lerp(MARK.check, k);
     }
     this.renderer.render(this.scene, this.camera);
+  }
+
+  /**
+   * If this device draws fewer than ~25 frames a second (measured over ~3 s of visible
+   * frames), lower the quality once: plain pixels and no shadows.
+   */
+  _watchSpeed(now) {
+    if (this.downgraded || document.hidden) return;
+    const f = this.frameTimes;
+    if (f.length && now - f[f.length - 1] > 500) f.length = 0; // a pause (tab hidden), start over
+    f.push(now);
+    if (f.length < 90) return;
+    const avg = (f[f.length - 1] - f[0]) / (f.length - 1);
+    f.length = 0;
+    if (avg <= 40) { this.downgraded = "checked"; return; }
+    this.downgraded = true;
+    this.renderer.setPixelRatio(1);
+    this.renderer.shadowMap.enabled = false;
+    this.scene.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); });
+    this._resize();
+    console.info(`3D board: ${Math.round(1000 / avg)} fps, switched to lighter graphics`);
   }
 
   _tween(ms, step, done) {
