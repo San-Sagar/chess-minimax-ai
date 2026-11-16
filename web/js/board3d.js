@@ -44,6 +44,7 @@ export class Board3D {
     this.promo = null;
     this.intro = null;
     this.traySignature = "";
+    this.trayY = -0.6; // height of the table the captured pieces stand on
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -134,26 +135,35 @@ export class Board3D {
 
   _buildBoard() {
     // inlaid squares: maple and walnut, each showing a different part of the grain
-    const maple = woodTexture("maple", WOODS.maple), walnut = woodTexture("walnut", WOODS.walnut);
+    this._buildTiles(woodTexture("maple", WOODS.maple), woodTexture("walnut", WOODS.walnut),
+                     { roughness: 0.38, clearcoat: 0.35, clearcoatRoughness: 0.3 });
+    this._buildFrame();
+    this._buildLabels("#e9d3a6");
+    this._buildDots();
+  }
+
+  /** The 64 squares; each shows a different part of its texture. */
+  _buildTiles(lightMap, darkMap, materialOptions) {
     this.tiles = [];
     const tileGeo = new THREE.BoxGeometry(1, 0.08, 1);
     for (let sq = 0; sq < 64; sq++) {
       const light = ((sq % 8) + Math.floor(sq / 8)) % 2 === 1;
-      const map = (light ? maple : walnut).clone();
+      const map = (light ? lightMap : darkMap).clone();
       map.repeat.set(0.3, 0.3);
       map.offset.set((sq * 0.37) % 1, (sq * 0.61) % 1);
       if (sq % 3 === 0) map.rotation = Math.PI / 2;
       map.needsUpdate = true;
       const base = new THREE.Color("#ffffff");
-      const tile = new THREE.Mesh(tileGeo, new THREE.MeshPhysicalMaterial({
-        map, color: base, roughness: 0.38, clearcoat: 0.35, clearcoatRoughness: 0.3 }));
+      const tile = new THREE.Mesh(tileGeo, new THREE.MeshPhysicalMaterial({ map, color: base, ...materialOptions }));
       tile.position.set(sqX(sq), -0.04, sqZ(sq));
       tile.receiveShadow = true;
       tile.userData = { sq, base };
       this.tiles.push(tile);
       this.scene.add(tile);
     }
+  }
 
+  _buildFrame() {
     // frame: a thick border with a bevelled edge, and a darker plinth under it
     const frameMat = new THREE.MeshPhysicalMaterial({
       map: woodTexture("frame", WOODS.frame), roughness: 0.4, clearcoat: 0.5, clearcoatRoughness: 0.3 });
@@ -185,8 +195,10 @@ export class Board3D {
     ground.position.y = -0.62;
     ground.receiveShadow = true;
     this.scene.add(ground);
+  }
 
-    // a-h and 1-8 carved into the frame on all four sides
+  /** a-h and 1-8 on all four sides of the board. */
+  _buildLabels(color) {
     this.labels = [];
     const labelGeo = new THREE.PlaneGeometry(0.42, 0.42);
     const along = [-3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5];
@@ -195,7 +207,7 @@ export class Board3D {
       for (const side of [1, -1]) {
         for (const [text, x, z] of [[FILES[i], p, side * edge], [String(i + 1), side * edge, -p]]) {
           const m = new THREE.Mesh(labelGeo, new THREE.MeshBasicMaterial({
-            map: labelTexture(text), transparent: true, depthWrite: false }));
+            map: labelTexture(text, color), transparent: true, depthWrite: false }));
           m.rotation.x = -Math.PI / 2;
           m.position.set(x, 0.065, z);
           this.labels.push(m);
@@ -203,8 +215,10 @@ export class Board3D {
         }
       }
     });
+  }
 
-    // legal-move markers: a dot for a quiet move, a ring for a capture
+  /** Legal-move markers: a dot for a quiet move, a ring for a capture. */
+  _buildDots() {
     this.dots = [];
     const dotGeo = new THREE.CircleGeometry(0.15, 28);
     const ringGeo = new THREE.RingGeometry(0.39, 0.47, 40);
@@ -259,6 +273,7 @@ export class Board3D {
       if (t >= 1) { tw.done?.(); return false; }
       return true;
     });
+    this._animateIdle(now);
     if (this.intro) this._introFrame(now);
     else this.controls.update();
     if (this.checkSquare !== null) { // the checked king's square pulses
@@ -316,8 +331,16 @@ export class Board3D {
 
   // ------------------------------------------------------------ pieces
 
+  /** One piece model (the Battle view replaces this with soldiers). */
+  _createPiece(type, color) {
+    return buildPiece(type, color);
+  }
+
+  /** Per-frame animation of the pieces standing still (none for wooden pieces). */
+  _animateIdle() {}
+
   _addPiece(letter, sq) {
-    const obj = buildPiece(letter.toLowerCase(), colorOf(letter));
+    const obj = this._createPiece(letter.toLowerCase(), colorOf(letter));
     obj.position.set(sqX(sq), 0, sqZ(sq));
     obj.userData.letter = letter;
     this.scene.add(obj);
@@ -421,10 +444,10 @@ export class Board3D {
     // Black's lost pieces on White's right, White's lost pieces on Black's right
     for (const [c, x, dirZ] of [["black", 5.55, 1], ["white", -5.55, -1]]) {
       lost[c].forEach((t, i) => {
-        const p = buildPiece(t, c);
+        const p = this._createPiece(t, c);
         const col = Math.floor(i / 8), row = i % 8;
         p.scale.setScalar(0.62);
-        p.position.set(x + (x > 0 ? 1 : -1) * col * 0.55, -0.6, dirZ * (3.6 - row * 0.62));
+        p.position.set(x + (x > 0 ? 1 : -1) * col * 0.55, this.trayY, dirZ * (3.6 - row * 0.62));
         this.trays.add(p);
       });
     }

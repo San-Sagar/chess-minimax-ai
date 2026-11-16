@@ -50,7 +50,7 @@ async function chooseMode(mode, clicked = false) {
   showMode(mode);
   const used = await board.setMode(mode);
   if (used !== mode) toast("The 3D board couldn't start here, so the plain board is used.");
-  else if (mode === "battle" && clicked) toast("Battle armies are coming soon. For now Battle shows the 3D board.");
+  else if (mode === "battle" && clicked) toast("Battle mode: the armies are here. Attack animations arrive in the next update.");
 }
 
 for (const b of document.querySelectorAll(".mode-btn")) {

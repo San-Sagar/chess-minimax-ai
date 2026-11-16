@@ -78,7 +78,8 @@ export class BoardHost {
     let View = ChessBoard;
     if (mode !== "plain") {
       try {
-        View = (await import("./board3d.js")).Board3D;
+        View = mode === "battle" ? (await import("./battle3d.js")).BattleBoard
+          : (await import("./board3d.js")).Board3D;
       } catch (err) {
         console.error("3D board failed to load", err);
         mode = "plain";

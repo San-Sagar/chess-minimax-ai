@@ -79,6 +79,66 @@ export const WOODS = {
   ebony: { light: "#3b2b22", dark: "#120c09", rings: 8, seed: 17, contrast: 0.7, size: 256 },
 };
 
+/**
+ * Stone or earth: layered noise blending between colours, with darker cracks.
+ * @param {{colors: string[], seed?: number, size?: number, cracks?: number, speckle?: number}} o
+ *   colors: 2 or 3 colours blended by the noise (e.g. dirt, grass)
+ */
+export function noiseTexture(name, { colors, seed = 1, size = 256, cracks = 0.5, speckle = 0.25 }) {
+  if (cache.has(name)) return cache.get(name);
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  const img = ctx.createImageData(size, size);
+  const n1 = valueNoise(seed, 4), n2 = valueNoise(seed + 3, 12), n3 = valueNoise(seed + 5, 48);
+  const crackNoise = valueNoise(seed + 9, 8);
+  const cols = colors.map(hex);
+  const rnd = rng(seed + 21);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const u = x / size, v = y / size;
+      let t = n1(u * 4, v * 4) * 0.55 + n2(u * 12, v * 12) * 0.3 + n3(u * 48, v * 48) * 0.15;
+      t = Math.min(0.999, Math.max(0, (t - 0.2) / 0.6));
+      const seg = t * (cols.length - 1), k = Math.floor(seg), f = seg - k;
+      const a = cols[k], b = cols[Math.min(k + 1, cols.length - 1)];
+      let r = a.r + (b.r - a.r) * f, g = a.g + (b.g - a.g) * f, bl = a.b + (b.b - a.b) * f;
+      // cracks: thin lines where the crack noise crosses 0.5
+      const c = Math.abs(crackNoise(u * 8, v * 8) - 0.5);
+      const dark = (c < 0.012 ? cracks : 0) + (rnd() - 0.5) * speckle * 0.4;
+      r *= 1 - dark; g *= 1 - dark; bl *= 1 - dark;
+      const i = (y * size + x) * 4;
+      img.data[i] = Math.min(255, r * 255);
+      img.data[i + 1] = Math.min(255, g * 255);
+      img.data[i + 2] = Math.min(255, bl * 255);
+      img.data[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.anisotropy = 4;
+  cache.set(name, tex);
+  return tex;
+}
+
+/** Vertical sky gradient (top colour to horizon colour). */
+export function skyTexture(name, stops) {
+  if (cache.has(name)) return cache.get(name);
+  const c = document.createElement("canvas");
+  c.width = 4;
+  c.height = 256;
+  const g = c.getContext("2d");
+  const grad = g.createLinearGradient(0, 0, 0, 256);
+  stops.forEach(([at, color]) => grad.addColorStop(at, color));
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 4, 256);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  cache.set(name, tex);
+  return tex;
+}
+
 /** Small square texture with one letter or digit, for the board's edge labels. */
 export function labelTexture(text, color = "#e9d3a6") {
   const key = `label:${text}:${color}`;
