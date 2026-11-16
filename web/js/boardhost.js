@@ -56,7 +56,8 @@ export class BoardHost {
   flip() { this.setOrientation(this.last.orientation === "white" ? "black" : "white"); }
 
   setPosition(fen, opts = {}) {
-    Object.assign(this.last, { fen, lastMove: opts.lastMove ?? null, check: !!opts.check });
+    Object.assign(this.last, { fen, lastMove: opts.lastMove ?? null, check: !!opts.check,
+                               mated: !!opts.mated });
     this.view.setPosition(fen, opts);
   }
 
@@ -115,7 +116,7 @@ export class BoardHost {
   _replay() {
     const s = this.last;
     this.view.setOrientation(s.orientation);
-    if (s.fen) this.view.setPosition(s.fen, { lastMove: s.lastMove, check: s.check });
+    if (s.fen) this.view.setPosition(s.fen, { lastMove: s.lastMove, check: s.check, mated: s.mated });
     this.view.setInteractive(s.color, s.legal);
     this.view.playIntro?.({ drop: false });
   }

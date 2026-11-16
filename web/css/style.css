@@ -137,6 +137,13 @@ h2:first-child { margin-top: 0; }
 .promo.promo-3d { left: 50%; top: 50%; transform: translate(-50%, -50%); width: auto;
                   flex-direction: row; }
 .promo.promo-3d button { width: 64px; height: 64px; font-size: 44px; }
+.battle-speed { position: absolute; top: 8px; right: 8px; z-index: 5; display: flex; gap: 2px;
+                padding: 3px; border-radius: 8px; background: rgba(15, 17, 22, .72); backdrop-filter: blur(4px); }
+.battle-speed button { font: inherit; font-size: 12px; color: #c9c3b8; background: transparent; border: 0;
+                       border-radius: 6px; padding: 4px 9px; cursor: pointer; }
+.battle-speed button:hover { color: #fff; }
+.battle-speed button[aria-pressed="true"] { background: #e6c86e; color: #1d1a14; font-weight: 700; }
+.battle-speed button:focus-visible { outline: 2px solid #e6c86e; }
 .promo.promo-3d .promo-cancel { width: 40px; font-size: 20px; color: var(--muted); }
 
 /* ------------------------------------------------------------------ players & clocks */

@@ -33,6 +33,7 @@ const app = {
 };
 
 const board = new BoardHost($("board"), { onMove: humanMove, onModeChange: showMode });
+if (new URLSearchParams(location.search).has("debug")) window.debugBoard = board; // for testing
 
 // ---------------------------------------------------------------- board style (Plain / 3D / Battle)
 
@@ -50,7 +51,7 @@ async function chooseMode(mode, clicked = false) {
   showMode(mode);
   const used = await board.setMode(mode);
   if (used !== mode) toast("The 3D board couldn't start here, so the plain board is used.");
-  else if (mode === "battle" && clicked) toast("Battle mode: the armies are here. Attack animations arrive in the next update.");
+  else if (mode === "battle" && clicked) toast("Battle mode: every capture is a fight. Use 1× / 2× / Skip on the board to set the pace.");
 }
 
 for (const b of document.querySelectorAll(".mode-btn")) {
@@ -302,7 +303,8 @@ function render(forceReset = false) {
   const prevFen = ply === 0 ? null : ply === 1 ? g.start_fen : history[ply - 2].fen_after;
   const animate = rec && app.shownFen && app.shownFen === prevFen ? rec.uci : null;
   board.setPosition(fen, { animate, lastMove: rec ? rec.uci : null,
-                           check: live ? g.is_check : !!rec?.is_check });
+                           check: live ? g.is_check : !!rec?.is_check,
+                           mated: live && g.status.reason === "checkmate" }); // Battle: king kneels
   app.shownFen = fen;
 
   const yourTurn = live && !g.status.is_over && g.turn === s.human_color && !app.thinking;
