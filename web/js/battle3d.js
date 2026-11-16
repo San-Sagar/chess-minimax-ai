@@ -344,10 +344,10 @@ export class BattleBoard extends Board3D {
         r.armR.rotation.x = lerp(a0, 0.3, easeOut(t));
         r.body.rotation.x = lerp(0, -0.12, t);
       });
-      await this._anim(140, (t) => { // thrust
+      await this._anim(140, (t) => { // thrust: arm straight out, spear tip pointing forward
         r.armR.rotation.x = lerp(0.3, -1.45, easeIn(t));
         r.foreR.rotation.x = lerp(f0, -0.1, t);
-        r.spear.rotation.x = lerp(s0, 1.45, t);
+        r.spear.rotation.x = lerp(s0, 3.05, t);
         r.body.rotation.x = lerp(-0.12, 0.25, t);
       });
       this._sfx("stab");
@@ -356,7 +356,7 @@ export class BattleBoard extends Board3D {
       await this._anim(260, (t) => {
         r.armR.rotation.x = lerp(-1.45, a0, easeInOut(t));
         r.foreR.rotation.x = lerp(-0.1, f0, t);
-        r.spear.rotation.x = lerp(1.45, s0, t);
+        r.spear.rotation.x = lerp(3.05, s0, t);
         r.body.rotation.x = lerp(0.25, 0, t);
       });
       await dying;
@@ -410,10 +410,11 @@ export class BattleBoard extends Board3D {
     }
 
     if (type === "q") { // sorceress: raise the staff, call lightning
-      const a0 = r.armR.rotation.x, f0 = r.foreR.rotation.x;
-      await this._anim(380, (t) => {
+      const a0 = r.armR.rotation.x, f0 = r.foreR.rotation.x, st0 = r.staff.rotation.x;
+      await this._anim(380, (t) => { // arm up, staff turned so the orb is held high
         r.armR.rotation.x = lerp(a0, -2.3, easeOut(t));
         r.foreR.rotation.x = lerp(f0, -0.2, t);
+        r.staff.rotation.x = lerp(st0, 2.8, easeOut(t));
         r.orbGlow.scale.setScalar(0.5 + t * 0.6);
       });
       const orb = this._worldOf(r.orb);
@@ -426,6 +427,7 @@ export class BattleBoard extends Board3D {
       await this._anim(300, (t) => {
         r.armR.rotation.x = lerp(-2.3, a0, t);
         r.foreR.rotation.x = lerp(-0.2, f0, t);
+        r.staff.rotation.x = lerp(2.8, st0, t);
         r.orbGlow.scale.setScalar(1.1 - t * 0.6);
       });
       await dying;
